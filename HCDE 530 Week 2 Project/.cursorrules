@@ -1,0 +1,53 @@
+# Project Context
+You are working in a beginner-friendly HCDE coursework project.
+
+# Project Context Profile
+- Practitioner background: HCD practitioner (not a software engineer), working in UX research/UX design contexts.
+- Primary goal: Let users run a simple script and optionally view results as a web page.
+- Primary audience: A mix of self, classmates/instructor, and UX teammates/stakeholders.
+- Default workflow: Run the Python script first, then open the dashboard.
+- Terminal output preference: Quick summary only (not verbose per-participant logs by default).
+- Dashboard preference: High-level metrics only by default.
+- Coding style preference: Beginner-friendly explanations and code style.
+- Implementation preference: Balance clarity and compactness.
+- Error-handling preference: Fail fast with clear, actionable error messages.
+- Dependency preference: Default to dependency-free solutions unless explicitly requested otherwise.
+
+# Directory Structure
+Keep this structure section current whenever files are added, removed, or renamed.
+
+HCDE 530 Week 2 Project/
+- `.cursorrules` (project guidance for Cursor)
+- `demo_word_count.py` (Python script for loading CSV and counting words)
+- `demo_responses.csv` (source response dataset)
+- `dashboard.html` (standalone HTML dashboard for CSV data)
+
+# Project Conventions
+- Prefer simple, readable Python over clever one-liners.
+- Explain changes in plain language suitable for students learning programming.
+- Keep scripts self-contained and easy to run locally.
+- Prioritize beginner readability while avoiding unnecessary verbosity.
+- Keep defaults aligned to the Project Context Profile unless the user asks to override.
+
+# For Python Files
+- Use clear variable names (`response_text`, `word_count`, etc.).
+- Add short docstrings for non-trivial functions.
+- Avoid adding external dependencies unless explicitly requested.
+- Preserve existing script behavior unless the request asks for functional changes.
+- Default script output to a concise summary; add detailed output only on request.
+- Validate required files/columns early and exit with clear errors when invalid.
+
+# For CSV/Data Work
+- Assume UTF-8 input and handle missing/blank fields safely.
+- Do not silently drop rows without noting why.
+- Keep transformation logic explicit and easy to inspect.
+
+# For HTML Dashboards
+- Prefer a single standalone HTML file unless the user asks for a multi-file app.
+- Keep JavaScript vanilla (no frameworks) unless requested.
+- Include clear headings, labels, and readable defaults.
+- Default to high-level metric cards; add advanced detail only when requested.
+
+# When Unsure
+- Ask one concise clarifying question before large structural changes.
+- If project files changed, update the `# Directory Structure` section in this file.
