@@ -14,13 +14,16 @@ You are working in a beginner-friendly HCDE coursework project.
 - Dependency preference: Default to dependency-free solutions unless explicitly requested otherwise.
 
 # Directory Structure
-Keep this structure section current whenever files are added, removed, or renamed.
+Keep this section and the directory tree in `context.md` current whenever files are added, removed, or renamed.
 
 HCDE 530 Week 2 Project/
-- `.cursorrules` (project guidance for Cursor)
-- `demo_word_count.py` (Python script for loading CSV and counting words)
-- `demo_responses.csv` (source response dataset)
-- `dashboard.html` (standalone HTML dashboard for CSV data)
+- `.cursorrules` (Cursor AI guidance and rules)
+- `context.md` (human-readable project context; mirror this section)
+- `app_review_word_count.py` (50 sample app reviews + word counts + summary)
+- `demo_word_count.py` (load CSV + word counts, course demo)
+- `demo_responses.csv` (example response data)
+- `dashboard.html` (standalone web dashboard)
+- `week2.md` (Week 2 reflection: Competency 2)
 
 # Project Conventions
 - Prefer simple, readable Python over clever one-liners.
@@ -50,4 +53,4 @@ HCDE 530 Week 2 Project/
 
 # When Unsure
 - Ask one concise clarifying question before large structural changes.
-- If project files changed, update the `# Directory Structure` section in this file.
+- If project files changed, update the `# Directory Structure` section in this file and the directory tree in `context.md`.
