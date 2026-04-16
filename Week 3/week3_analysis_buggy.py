@@ -1,6 +1,6 @@
 import csv
 
-
+# Function to summarize primary tools
 def summarize_primary_tools(rows):
     """Return participant counts grouped by normalized primary tool name."""
     tool_counts = {}
@@ -11,7 +11,7 @@ def summarize_primary_tools(rows):
         tool_counts[tool] = tool_counts.get(tool, 0) + 1
     return tool_counts
 
-
+# Function to summarize the cleaned data
 def summarize_data(cleaned_rows):
     """Return a plain-language summary of key cleaned dataset stats."""
     row_count = len(cleaned_rows)
@@ -74,14 +74,15 @@ scored_rows = []
 for row in rows:
     if row["satisfaction_score"].strip():
         scored_rows.append((row["participant_name"], int(row["satisfaction_score"])))
-
+# Sort the scored rows by satisfaction score in descending order
 scored_rows.sort(key=lambda x: x[1], reverse=True)
 top5 = scored_rows[:5]
-
+# Print the top 5 satisfaction scores
 print("\nTop 5 satisfaction scores:")
 for name, score in top5:
     print(f"  {name}: {score}")
 
+# Summarize the primary tools used by the participants
 tool_counts = summarize_primary_tools(rows)
 print("\nParticipants by primary tool:")
 for tool, count in sorted(tool_counts.items()):
