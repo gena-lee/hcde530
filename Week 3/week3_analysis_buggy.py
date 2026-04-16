@@ -12,6 +12,25 @@ def summarize_primary_tools(rows):
     return tool_counts
 
 
+def summarize_data(cleaned_rows):
+    """Return a plain-language summary of key cleaned dataset stats."""
+    row_count = len(cleaned_rows)
+    unique_roles = sorted(
+        {(row.get("role") or "").strip() for row in cleaned_rows if (row.get("role") or "").strip()}
+    )
+    empty_name_fields = 0
+    for row in cleaned_rows:
+        name_value = (row.get("name") or row.get("participant_name") or "").strip()
+        if not name_value:
+            empty_name_fields += 1
+
+    return (
+        f"The cleaned dataset has {row_count} rows. "
+        f"Unique roles are: {', '.join(unique_roles)}. "
+        f"Number of empty name fields: {empty_name_fields}."
+    )
+
+
 # Load the survey data from a CSV file
 filename = "week3_survey_messy.csv"
 rows = []
@@ -67,3 +86,14 @@ tool_counts = summarize_primary_tools(rows)
 print("\nParticipants by primary tool:")
 for tool, count in sorted(tool_counts.items()):
     print(f"  {tool}: {count}")
+
+# Plain-language summary for cleaned data
+cleaned_filename = "week3_survey_cleaned.csv"
+cleaned_rows = []
+with open(cleaned_filename, newline="", encoding="utf-8") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        cleaned_rows.append(row)
+
+print("\nCleaned data summary:")
+print(summarize_data(cleaned_rows))
