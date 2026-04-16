@@ -1,5 +1,17 @@
 import csv
 
+
+def summarize_primary_tools(rows):
+    """Return participant counts grouped by normalized primary tool name."""
+    tool_counts = {}
+    for row in rows:
+        tool = (row.get("primary_tool") or "").strip().title()
+        if not tool:
+            continue
+        tool_counts[tool] = tool_counts.get(tool, 0) + 1
+    return tool_counts
+
+
 # Load the survey data from a CSV file
 filename = "week3_survey_messy.csv"
 rows = []
@@ -50,3 +62,8 @@ top5 = scored_rows[:5]
 print("\nTop 5 satisfaction scores:")
 for name, score in top5:
     print(f"  {name}: {score}")
+
+tool_counts = summarize_primary_tools(rows)
+print("\nParticipants by primary tool:")
+for tool, count in sorted(tool_counts.items()):
+    print(f"  {tool}: {count}")
