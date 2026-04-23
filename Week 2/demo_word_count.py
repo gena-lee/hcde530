@@ -1,7 +1,7 @@
 import csv
 
 
-# Load the CSV file
+# Load the CSV file into a list of dictionaries
 filename = "demo_responses.csv"
 responses = []
 
@@ -26,7 +26,7 @@ print("-" * 75)
 
 word_counts = []
 
-# Loop through each row in the responses list
+# 
 for row in responses:
     participant = row["participant_id"]
     role = row["role"]
