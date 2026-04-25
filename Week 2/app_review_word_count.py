@@ -6,6 +6,8 @@ def count_words(text):
     return len(text.split())
 
 
+# I use an in-memory list to keep the demo self-contained and predictable.
+# That makes it easier to focus on analysis flow before introducing CSV input.
 reviews = [
     "Love the clean layout and quick loading speed.",
     "Great features, but the search filter still feels clunky.",
@@ -61,13 +63,18 @@ reviews = [
 
 word_counts = []
 
+# Single pass for clarity: count words, store results, and print per-review output.
 for index, review in enumerate(reviews, start=1):
     words = count_words(review)
+    # Keeping raw counts lets us calculate multiple summary metrics afterward.
     word_counts.append(words)
+    # Per-review output makes outliers visible before the final summary section.
     print(f"Review {index:>2}: {words:>2} words")
 
 average = sum(word_counts) / len(word_counts)
 
+# Final summary gives a compact "shape" of the dataset:
+# size, range, and typical review length.
 print()
 print("Summary")
 print("-" * 30)
