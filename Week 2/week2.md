@@ -1,30 +1,29 @@
 # Week 2 — Competency 2: Code literacy and documentation
 
-## What I worked on
+## What I worked on (and why I documented)
 
-This week I practiced **code literacy and documentation** by:
+I practiced **code literacy and documentation** by commenting code for **intent** (not only mechanics), adding **`.cursorrules`** for project context, using **Cursor** to translate jargon, and building **dashboard-style HTML** alongside terminal output. Documentation here is part of **code literacy**: naming tradeoffs and explaining *why* a script is structured a certain way—not only that it runs.
 
-- Adding comments to code so it would be easier to follow later.
-- Creating a **`.cursorrules`** file to capture how I want help from tools and collaborators, and to document project context (audience, workflow preferences, and file layout).
-- Using **Cursor** to read code with me and translate unfamiliar pieces into plain language.
-- Building **dashboard-style HTML** so results could be viewed on the web, not only in the terminal.
+## Specific choices in my scripts
 
-## Why I documented things this way
+### `demo_word_count.py`
 
-My documentation served a **mix of purposes**: helping **future me**, supporting **collaborators**, and giving **AI assistants** clearer context so explanations and suggestions match how I work.
+- **`csv.DictReader` with `encoding="utf-8"` and `newline=""`**: Named keys (`row["response"]`) keep the loop readable and stable if column order changes; CSV defaults are set deliberately so text behaves predictably.
+- **`count_words()` helper**: One place defines “what counts as a word,” so summaries stay consistent if that rule changes.
+- **Fixed-width table, 60-character preview, then min/max/average**: Cases first, aggregate second—**progressive disclosure** and output that is easy to scan in a narrow terminal.
 
-## What was hard
+### `app_review_word_count.py`
 
-A lot of the material introduced **technical jargon** I did not understand at first. That made reading and reasoning about code slower than I wanted.
+- **Reviews in a Python list**: Self-contained practice so I could focus on loops and stats without file I/O yet.
+- **`enumerate(..., start=1)` plus collecting `word_counts` then summary stats**: Readable review numbering without extra counters; gather counts in one pass, interpret (min/max/average) after—clearer to read and extend.
 
-## What helped
+## What was challenging and what helped
 
-- Asking **Cursor** to explain ideas in **plain language**.
-- Getting **help from my instructor** when I was stuck or needed confirmation.
+New **technical jargon** slowed me down at first. **Cursor** in plain language and **instructor** check-ins when I was stuck made the material easier to connect to my own scripts.
 
 ## How this connects to my UX practice
 
-I see **code literacy** as important for understanding how **design work lines up with developers**—what is feasible, how things are implemented, and how to communicate across disciplines. I am also learning how to **incorporate light scripting and small tools** into my design process when they help me explore or communicate data.
+**Code literacy** helps me align with developers on feasibility and implementation. The script choices mirror UX habits I already value: **progressive disclosure**, **scannable information architecture**, and **consistency**—documented in `week2.md` and comments so documentation reads as part of the work, not an add-on.
 
 ## Artifacts (this project)
 
@@ -35,7 +34,3 @@ I see **code literacy** as important for understanding how **design work lines u
 | `demo_responses.csv` | Example qualitative-style responses |
 | `dashboard.html` | Web view of summary-style metrics |
 | `app_review_word_count.py` | Standalone script with sample reviews and summary stats |
-
-## Notes for next time
-
-- (Optional) Add a one-sentence **main takeaway** you want to remember from this week when you revisit this file.
