@@ -1,6 +1,6 @@
 """Count words in made-up app reviews and print summary stats."""
 
-
+# I use the count_words helper function to count the number of words in a text string.
 def count_words(text):
     """Return the number of words in a text string."""
     return len(text.split())
@@ -63,7 +63,8 @@ reviews = [
 
 word_counts = []
 
-# Single pass for clarity: count words, store results, and print per-review output.
+# One loop through reviews: each iteration counts words, saves the count, and prints—no second pass.
+# this approach is more efficient than creating a separate list for the counts.
 for index, review in enumerate(reviews, start=1):
     words = count_words(review)
     # Keeping raw counts lets us calculate multiple summary metrics afterward.
@@ -74,7 +75,7 @@ for index, review in enumerate(reviews, start=1):
 average = sum(word_counts) / len(word_counts)
 
 # Final summary gives a compact "shape" of the dataset:
-# size, range, and typical review length.
+# I use the print() function to display the total, shortest, longest, and average number of words in the reviews.
 print()
 print("Summary")
 print("-" * 30)
