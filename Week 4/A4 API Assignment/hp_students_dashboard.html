@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HP Students Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #60a5fa;
+      --accent-2: #34d399;
+      --border: #1f2937;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(180deg, #0b1220 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.8rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .card .label {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .card .value {
+      margin-top: 6px;
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+    }
+
+    .bar-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 45px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bar-row .name {
+      color: #d1d5db;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bar-wrap {
+      background: #0b1220;
+      border: 1px solid #1f2b42;
+      border-radius: 999px;
+      overflow: hidden;
+      height: 14px;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      transition: width 450ms ease;
+    }
+
+    .bar.house {
+      background: linear-gradient(90deg, var(--accent), #2563eb);
+    }
+
+    .bar.ancestry {
+      background: linear-gradient(90deg, var(--accent-2), #059669);
+    }
+
+    .count {
+      text-align: right;
+      color: #d1d5db;
+      font-size: 0.9rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    input, select {
+      background: #0b1220;
+      color: var(--text);
+      border: 1px solid #22314d;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.92rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid #1f2937;
+      font-size: 0.92rem;
+    }
+
+    th {
+      color: #cbd5e1;
+      position: sticky;
+      top: 0;
+      background: #0f172a;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 8px;
+    }
+
+    .error {
+      color: #fca5a5;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Harry Potter Students Dashboard</h1>
+    <div class="subtitle">Source: <code>hp_students_name_house_ancestry.csv</code></div>
+
+    <div id="status" class="panel">Loading data...</div>
+
+    <div id="dashboard" hidden>
+      <div class="grid">
+        <div class="card">
+          <div class="label">Total Students</div>
+          <div id="totalStudents" class="value">0</div>
+        </div>
+        <div class="card">
+          <div class="label">Unique Houses</div>
+          <div id="uniqueHouses" class="value">0</div>
+        </div>
+        <div class="card">
+          <div class="label">Unique Ancestries</div>
+          <div id="uniqueAncestries" class="value">0</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>House Breakdown</h2>
+        <div id="houseBars" class="bar-list"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Ancestry Breakdown</h2>
+        <div id="ancestryBars" class="bar-list"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Student Table</h2>
+        <div class="controls">
+          <input id="searchInput" type="text" placeholder="Search name..." />
+          <select id="houseFilter">
+            <option value="">All houses</option>
+          </select>
+          <select id="ancestryFilter">
+            <option value="">All ancestries</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>House</th>
+              <th>Ancestry</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div id="rowCount" class="muted"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CSV_FILE = "hp_students_name_house_ancestry.csv";
+    const statusEl = document.getElementById("status");
+    const dashboardEl = document.getElementById("dashboard");
+    const totalStudentsEl = document.getElementById("totalStudents");
+    const uniqueHousesEl = document.getElementById("uniqueHouses");
+    const uniqueAncestriesEl = document.getElementById("uniqueAncestries");
+    const houseBarsEl = document.getElementById("houseBars");
+    const ancestryBarsEl = document.getElementById("ancestryBars");
+    const tableBodyEl = document.getElementById("tableBody");
+    const rowCountEl = document.getElementById("rowCount");
+    const searchInput = document.getElementById("searchInput");
+    const houseFilter = document.getElementById("houseFilter");
+    const ancestryFilter = document.getElementById("ancestryFilter");
+
+    let students = [];
+
+    function parseCsvLine(line) {
+      const out = [];
+      let current = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i += 1) {
+        const ch = line[i];
+        if (ch === '"') {
+          const next = line[i + 1];
+          if (inQuotes && next === '"') {
+            current += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === "," && !inQuotes) {
+          out.push(current);
+          current = "";
+        } else {
+          current += ch;
+        }
+      }
+
+      out.push(current);
+      return out;
+    }
+
+    function parseCsv(text) {
+      const lines = text.trim().split(/\r?\n/);
+      if (lines.length < 2) return [];
+
+      const headers = parseCsvLine(lines[0]).map((h) => h.trim().toLowerCase());
+      return lines.slice(1).map((line) => {
+        const cols = parseCsvLine(line);
+        const record = {};
+        headers.forEach((h, i) => {
+          record[h] = (cols[i] ?? "").trim();
+        });
+        return record;
+      });
+    }
+
+    function countBy(items, key) {
+      const counts = {};
+      items.forEach((item) => {
+        const value = item[key] || "Unknown";
+        counts[value] = (counts[value] || 0) + 1;
+      });
+      return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    }
+
+    function renderBars(targetEl, counts, typeClass) {
+      targetEl.innerHTML = "";
+      const maxCount = counts.length ? counts[0][1] : 1;
+
+      counts.forEach(([label, count]) => {
+        const row = document.createElement("div");
+        row.className = "bar-row";
+        row.innerHTML = `
+          <div class="name">${label}</div>
+          <div class="bar-wrap">
+            <div class="bar ${typeClass}" style="width: ${(count / maxCount) * 100}%"></div>
+          </div>
+          <div class="count">${count}</div>
+        `;
+        targetEl.appendChild(row);
+      });
+    }
+
+    function getFilteredRows() {
+      const q = searchInput.value.trim().toLowerCase();
+      const selectedHouse = houseFilter.value;
+      const selectedAncestry = ancestryFilter.value;
+
+      return students.filter((s) => {
+        const matchesName = !q || (s.name || "").toLowerCase().includes(q);
+        const matchesHouse = !selectedHouse || s.house === selectedHouse;
+        const matchesAncestry = !selectedAncestry || s.ancestry === selectedAncestry;
+        return matchesName && matchesHouse && matchesAncestry;
+      });
+    }
+
+    function renderTable(rows) {
+      tableBodyEl.innerHTML = "";
+      rows.forEach((s) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${s.name}</td><td>${s.house}</td><td>${s.ancestry}</td>`;
+        tableBodyEl.appendChild(tr);
+      });
+      rowCountEl.textContent = `Showing ${rows.length} of ${students.length} students`;
+    }
+
+    function renderFilters() {
+      const houses = [...new Set(students.map((s) => s.house))].sort();
+      const ancestries = [...new Set(students.map((s) => s.ancestry))].sort();
+
+      houses.forEach((house) => {
+        const opt = document.createElement("option");
+        opt.value = house;
+        opt.textContent = house;
+        houseFilter.appendChild(opt);
+      });
+
+      ancestries.forEach((ancestry) => {
+        const opt = document.createElement("option");
+        opt.value = ancestry;
+        opt.textContent = ancestry;
+        ancestryFilter.appendChild(opt);
+      });
+    }
+
+    function updateTable() {
+      renderTable(getFilteredRows());
+    }
+
+    async function init() {
+      try {
+        const response = await fetch(CSV_FILE);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const text = await response.text();
+        students = parseCsv(text);
+
+        if (!students.length) throw new Error("CSV has no data rows.");
+
+        const houseCounts = countBy(students, "house");
+        const ancestryCounts = countBy(students, "ancestry");
+
+        totalStudentsEl.textContent = String(students.length);
+        uniqueHousesEl.textContent = String(houseCounts.length);
+        uniqueAncestriesEl.textContent = String(ancestryCounts.length);
+
+        renderBars(houseBarsEl, houseCounts, "house");
+        renderBars(ancestryBarsEl, ancestryCounts, "ancestry");
+        renderFilters();
+        updateTable();
+
+        searchInput.addEventListener("input", updateTable);
+        houseFilter.addEventListener("change", updateTable);
+        ancestryFilter.addEventListener("change", updateTable);
+
+        statusEl.hidden = true;
+        dashboardEl.hidden = false;
+      } catch (err) {
+        statusEl.className = "panel error";
+        statusEl.textContent =
+          `Could not load ${CSV_FILE}. Start a local server in this folder and open the HTML via http://localhost. Error: ${err.message}`;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
