@@ -5,7 +5,7 @@ import requests
 
 # I linked the API url and endpoint to the students endpoint in order to get the students data.
 API_URL = "https://hp-api.onrender.com/api/characters/students"
-OUTPUT_CSV = Path(__file__).resolve().parent / "hp_students_name_house_ancestry.csv"
+OUTPUT_CSV = Path(__file__).resolve().parent / "hp_students_cleaned.csv"
 OUTPUT_ALL_CSV = Path(__file__).resolve().parent / "hp_students_all.csv"
 
 # I created a function to fetch the students data and listed the name, house, and ancestry of the students.
