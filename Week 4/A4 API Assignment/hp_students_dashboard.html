@@ -44,6 +44,48 @@
       margin-bottom: 20px;
       background: #2a1c14;
       box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-art {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 390px;
+      height: 100%;
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .hero-art svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .wand {
+      transform-origin: 230px 20px;
+      animation: wandFloat 3.2s ease-in-out infinite;
+    }
+
+    .sparkle {
+      transform-origin: center;
+      animation: sparklePulse 1.8s ease-in-out infinite;
+    }
+
+    .sparkle-2 {
+      animation-delay: 0.5s;
+    }
+
+    .sparkle-3 {
+      animation-delay: 1s;
     }
 
     h1 {
@@ -230,14 +272,64 @@
       .bar-row {
         grid-template-columns: 90px 1fr 40px;
       }
+
+      .hero-art {
+        width: 250px;
+        opacity: 0.3;
+      }
+    }
+
+    @keyframes wandFloat {
+      0%,
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-4px) rotate(-2deg);
+      }
+    }
+
+    @keyframes sparklePulse {
+      0%,
+      100% {
+        opacity: 0.25;
+        transform: scale(0.85);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.1);
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="hero">
-      <h1>Hogwarts Students Dashboard</h1>
-      <div class="subtitle">Source: <code>hp_students_name_house_ancestry.csv</code></div>
+      <div class="hero-content">
+        <h1>Hogwarts Students Dashboard</h1>
+        <div class="subtitle">Source: <code>hp_students_name_house_ancestry.csv</code></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg">
+          <!-- Wand -->
+          <g class="wand">
+            <line x1="208" y1="22" x2="277" y2="6" stroke="#f5d27a" stroke-width="2.5" />
+            <circle cx="203" cy="24" r="4" fill="#f5d27a" />
+          </g>
+          <!-- Sparkles -->
+          <path class="sparkle sparkle-1" d="M186 17 l4 8 l8 4 l-8 4 l-4 8 l-4-8 l-8-4 l8-4z" fill="#f8e8bf" />
+          <path class="sparkle sparkle-2" d="M170 34 l2 5 l5 2 l-5 2 l-2 5 l-2-5 l-5-2 l5-2z" fill="#f8e8bf" />
+          <path class="sparkle sparkle-3" d="M240 33 l3 6 l6 3 l-6 3 l-3 6 l-3-6 l-6-3 l6-3z" fill="#f8e8bf" />
+          <!-- Castle silhouette -->
+          <path
+            d="M42 122 h200 v-34 h-18 v-18 h-24 v18 h-10 v-30 h-22 v-16 h-10 v16 h-22 v30 h-10 v-22 h-20 v22 h-10 v-26 h-18 v26 h-12z"
+            fill="#9ca3af"
+          />
+          <rect x="134" y="96" width="16" height="26" fill="#4b5563" />
+          <rect x="78" y="98" width="10" height="10" fill="#f9e2a0" opacity="0.85" />
+          <rect x="206" y="92" width="10" height="10" fill="#f9e2a0" opacity="0.85" />
+        </svg>
+      </div>
     </div>
 
     <div id="status" class="panel">Loading data...</div>
