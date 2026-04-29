@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HP Students Dashboard</title>
+  <title>Hogwarts Students Dashboard</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #111827;
-      --muted: #94a3b8;
-      --text: #e5e7eb;
-      --accent: #60a5fa;
-      --accent-2: #34d399;
-      --border: #1f2937;
+      --bg: #0e0a07;
+      --bg-soft: #1b130f;
+      --card: rgba(34, 24, 16, 0.88);
+      --muted: #d4c2a3;
+      --text: #f3e9d8;
+      --accent: #d4a017;
+      --accent-2: #7f1d1d;
+      --accent-3: #1e3a8a;
+      --border: rgba(212, 160, 23, 0.28);
+      --shadow: 0 14px 32px rgba(8, 5, 2, 0.55);
     }
 
     * {
@@ -21,26 +24,48 @@
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(180deg, #0b1220 0%, var(--bg) 100%);
+      font-family: Georgia, "Times New Roman", Times, serif;
+      background: var(--bg);
       color: var(--text);
-      line-height: 1.4;
+      line-height: 1.45;
+      min-height: 100vh;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1140px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 28px 24px 36px;
+    }
+
+    .hero {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      background: #2a1c14;
+      box-shadow: var(--shadow);
     }
 
     h1 {
-      margin: 0 0 6px;
-      font-size: 1.8rem;
+      margin: 0 0 8px;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      letter-spacing: 0.02em;
+      color: #f8e8bf;
+      text-shadow: 0 1px 0 #000;
     }
 
     .subtitle {
       color: var(--muted);
-      margin-bottom: 18px;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .subtitle code {
+      background: rgba(212, 160, 23, 0.13);
+      border: 1px solid rgba(212, 160, 23, 0.4);
+      color: #ffe8a6;
+      border-radius: 6px;
+      padding: 2px 6px;
     }
 
     .grid {
@@ -53,8 +78,9 @@
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
+      border-radius: 14px;
+      padding: 15px;
+      box-shadow: var(--shadow);
     }
 
     .card .label {
@@ -64,21 +90,24 @@
 
     .card .value {
       margin-top: 6px;
-      font-size: 1.45rem;
+      font-size: 1.55rem;
       font-weight: 700;
+      color: #ffe8a6;
     }
 
     .panel {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
+      border-radius: 14px;
+      padding: 16px;
       margin-bottom: 14px;
+      box-shadow: var(--shadow);
     }
 
     h2 {
       margin: 0 0 10px;
-      font-size: 1.05rem;
+      font-size: 1.06rem;
+      letter-spacing: 0.01em;
     }
 
     .bar-list {
@@ -102,11 +131,11 @@
     }
 
     .bar-wrap {
-      background: #0b1220;
-      border: 1px solid #1f2b42;
+      background: #23160f;
+      border: 1px solid #5c3c18;
       border-radius: 999px;
       overflow: hidden;
-      height: 14px;
+      height: 15px;
     }
 
     .bar {
@@ -117,11 +146,11 @@
     }
 
     .bar.house {
-      background: linear-gradient(90deg, var(--accent), #2563eb);
+      background: #9b6a13;
     }
 
     .bar.ancestry {
-      background: linear-gradient(90deg, var(--accent-2), #059669);
+      background: #d4a017;
     }
 
     .count {
@@ -134,16 +163,31 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     input, select {
-      background: #0b1220;
+      background: #1e140f;
       color: var(--text);
-      border: 1px solid #22314d;
-      border-radius: 8px;
-      padding: 8px 10px;
+      border: 1px solid #5e4422;
+      border-radius: 10px;
+      padding: 9px 11px;
       font-size: 0.92rem;
+      outline: none;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.2);
+    }
+
+    .table-wrap {
+      max-height: 420px;
+      overflow: auto;
+      border: 1px solid #6a4a26;
+      border-radius: 12px;
+      background: #1a120d;
     }
 
     table {
@@ -162,7 +206,13 @@
       color: #cbd5e1;
       position: sticky;
       top: 0;
-      background: #0f172a;
+      background: #2b1c13;
+      z-index: 1;
+      backdrop-filter: blur(4px);
+    }
+
+    tbody tr:hover td {
+      background: rgba(212, 160, 23, 0.12);
     }
 
     .muted {
@@ -175,12 +225,20 @@
       color: #fca5a5;
       font-weight: 600;
     }
+
+    @media (max-width: 760px) {
+      .bar-row {
+        grid-template-columns: 90px 1fr 40px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Harry Potter Students Dashboard</h1>
-    <div class="subtitle">Source: <code>hp_students_name_house_ancestry.csv</code></div>
+    <div class="hero">
+      <h1>Hogwarts Students Dashboard</h1>
+      <div class="subtitle">Source: <code>hp_students_name_house_ancestry.csv</code></div>
+    </div>
 
     <div id="status" class="panel">Loading data...</div>
 
@@ -221,16 +279,18 @@
             <option value="">All ancestries</option>
           </select>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>House</th>
-              <th>Ancestry</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>House</th>
+                <th>Ancestry</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
         <div id="rowCount" class="muted"></div>
       </div>
     </div>
