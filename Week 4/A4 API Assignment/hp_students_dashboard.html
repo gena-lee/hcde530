@@ -110,6 +110,100 @@
       padding: 2px 6px;
     }
 
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 14px;
+      margin-top: 10px;
+    }
+
+    .source-row label {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    #dataSource {
+      min-width: 220px;
+    }
+
+    .house-chart-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .house-pie-svg {
+      width: min(260px, 88vw);
+      height: auto;
+      flex-shrink: 0;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+    }
+
+    .house-pie-svg path {
+      stroke: rgba(0, 0, 0, 0.35);
+      stroke-width: 1;
+    }
+
+    svg .pie-slice {
+      cursor: pointer;
+      transform: translate(0, 0);
+      transition: transform 0.35s ease-in-out;
+      transform-origin: 100px 100px;
+    }
+
+    svg .pie-slice:hover {
+      transform: translate(var(--dx), var(--dy));
+    }
+
+    svg .pie-slice path {
+      transition: filter 0.2s ease-in-out;
+    }
+
+    svg .pie-slice:hover path {
+      filter: brightness(1.12);
+    }
+
+    svg .pie-slice-label {
+      opacity: 0;
+      transition: opacity 0.26s ease-in-out;
+      pointer-events: none;
+      fill: #fffbeb;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: Georgia, "Times New Roman", serif;
+      stroke: rgba(0, 0, 0, 0.65);
+      stroke-width: 2.5px;
+      paint-order: stroke fill;
+    }
+
+    svg .pie-slice:hover .pie-slice-label {
+      opacity: 1;
+    }
+
+    .house-pie-legend {
+      display: grid;
+      gap: 8px;
+      min-width: 200px;
+    }
+
+    .legend-row {
+      display: grid;
+      grid-template-columns: 18px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.92rem;
+      color: #e8dcc8;
+    }
+
+    .legend-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.35);
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -307,7 +401,14 @@
     <div class="hero">
       <div class="hero-content">
         <h1>Hogwarts Students Dashboard</h1>
-        <div class="subtitle">Source: <code>hp_students_cleaned.csv</code></div>
+        <div class="subtitle">Source: <code id="currentCsvLabel">hp_students_cleaned.csv</code></div>
+        <div class="source-row">
+          <label for="dataSource">Dataset</label>
+          <select id="dataSource" aria-label="Choose CSV dataset">
+            <option value="hp_students_cleaned.csv">Cleaned — complete rows only</option>
+            <option value="hp_students_all.csv">All student rows from API</option>
+          </select>
+        </div>
       </div>
       <div class="hero-art" aria-hidden="true">
         <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg">
@@ -352,7 +453,7 @@
 
       <div class="panel">
         <h2>House Breakdown</h2>
-        <div id="houseBars" class="bar-list"></div>
+        <div id="houseBars" class="house-chart-container"></div>
       </div>
 
       <div class="panel">
@@ -389,7 +490,7 @@
   </div>
 
   <script>
-    const CSV_FILE = "hp_students_cleaned.csv";
+    const DEFAULT_CSV = "hp_students_cleaned.csv";
     const statusEl = document.getElementById("status");
     const dashboardEl = document.getElementById("dashboard");
     const totalStudentsEl = document.getElementById("totalStudents");
@@ -402,8 +503,11 @@
     const searchInput = document.getElementById("searchInput");
     const houseFilter = document.getElementById("houseFilter");
     const ancestryFilter = document.getElementById("ancestryFilter");
+    const dataSourceEl = document.getElementById("dataSource");
+    const currentCsvLabel = document.getElementById("currentCsvLabel");
 
     let students = [];
+    let listenersBound = false;
 
     function parseCsvLine(line) {
       const out = [];
@@ -474,6 +578,118 @@
       });
     }
 
+    /** Hogwarts-inspired colors (primary house tones). */
+    function houseFill(houseLabel) {
+      const key = (houseLabel || "").trim().toLowerCase();
+      if (key === "gryffindor") return "#740001";
+      if (key === "slytherin") return "#1a472a";
+      if (key === "ravenclaw") return "#0e1a40";
+      if (key === "hufflepuff") return "#ecb939";
+      return "#6b7280";
+    }
+
+    function pieSlicePath(cx, cy, r, startRad, endRad) {
+      const x1 = cx + r * Math.cos(startRad);
+      const y1 = cy + r * Math.sin(startRad);
+      const x2 = cx + r * Math.cos(endRad);
+      const y2 = cy + r * Math.sin(endRad);
+      const sweep = endRad > startRad ? 1 : 0;
+      const largeArc = Math.abs(endRad - startRad) > Math.PI ? 1 : 0;
+      return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} Z`;
+    }
+
+    function renderHousePieChart(containerEl, counts) {
+      containerEl.innerHTML = "";
+      const total = counts.reduce((sum, [, c]) => sum + c, 0);
+      if (!total) return;
+
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("viewBox", "0 0 200 200");
+      svg.setAttribute("class", "house-pie-svg");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", "Students by Hogwarts house");
+
+      const cx = 100;
+      const cy = 100;
+      const r = 88;
+      let cumulative = 0;
+      const popDistance = 14;
+
+      counts.forEach(([label, count]) => {
+        const startRad = -Math.PI / 2 + (cumulative / total) * 2 * Math.PI;
+        const endRad = -Math.PI / 2 + ((cumulative + count) / total) * 2 * Math.PI;
+        const midRad = (startRad + endRad) / 2;
+        cumulative += count;
+
+        const pct = ((count / total) * 100).toFixed(1);
+
+        const group = document.createElementNS(svgNS, "g");
+        group.setAttribute("class", "pie-slice");
+
+        const path = document.createElementNS(svgNS, "path");
+        path.setAttribute("d", pieSlicePath(cx, cy, r, startRad, endRad));
+        path.setAttribute("fill", houseFill(label));
+        path.setAttribute("data-house", label);
+
+        const tip = document.createElementNS(svgNS, "title");
+        tip.textContent = `${label || "Unknown"} — ${count} students (${pct}%)`;
+
+        const dx = popDistance * Math.cos(midRad);
+        const dy = popDistance * Math.sin(midRad);
+        group.style.setProperty("--dx", `${dx}px`);
+        group.style.setProperty("--dy", `${dy}px`);
+
+        const labelR = r * 0.52;
+        const tx = cx + labelR * Math.cos(midRad);
+        const ty = cy + labelR * Math.sin(midRad);
+        const pctText = document.createElementNS(svgNS, "text");
+        pctText.setAttribute("class", "pie-slice-label");
+        pctText.setAttribute("x", String(tx));
+        pctText.setAttribute("y", String(ty));
+        pctText.setAttribute("text-anchor", "middle");
+        pctText.setAttribute("dominant-baseline", "middle");
+        pctText.textContent = `${pct}%`;
+
+        group.appendChild(tip);
+        group.appendChild(path);
+        group.appendChild(pctText);
+
+        group.addEventListener("mouseenter", () => {
+          svg.appendChild(group);
+        });
+
+        svg.appendChild(group);
+      });
+
+      const legend = document.createElement("div");
+      legend.className = "house-pie-legend";
+
+      counts.forEach(([label, count]) => {
+        const row = document.createElement("div");
+        row.className = "legend-row";
+
+        const swatch = document.createElement("span");
+        swatch.className = "legend-swatch";
+        swatch.style.background = houseFill(label);
+
+        const nameEl = document.createElement("span");
+        nameEl.textContent = label || "Unknown";
+
+        const cntEl = document.createElement("span");
+        cntEl.textContent = String(count);
+        cntEl.style.color = "#d4c2a3";
+
+        row.appendChild(swatch);
+        row.appendChild(nameEl);
+        row.appendChild(cntEl);
+        legend.appendChild(row);
+      });
+
+      containerEl.appendChild(svg);
+      containerEl.appendChild(legend);
+    }
+
     function getFilteredRows() {
       const q = searchInput.value.trim().toLowerCase();
       const selectedHouse = houseFilter.value;
@@ -497,7 +713,13 @@
       rowCountEl.textContent = `Showing ${rows.length} of ${students.length} students`;
     }
 
+    function resetFilterSelects() {
+      houseFilter.innerHTML = '<option value="">All houses</option>';
+      ancestryFilter.innerHTML = '<option value="">All ancestries</option>';
+    }
+
     function renderFilters() {
+      resetFilterSelects();
       const houses = [...new Set(students.map((s) => s.house))].sort();
       const ancestries = [...new Set(students.map((s) => s.ancestry))].sort();
 
@@ -520,9 +742,15 @@
       renderTable(getFilteredRows());
     }
 
-    async function init() {
+    async function loadDashboard(csvFile) {
+      statusEl.hidden = false;
+      statusEl.className = "panel";
+      statusEl.textContent = "Loading data...";
+      dashboardEl.hidden = true;
+      currentCsvLabel.textContent = csvFile;
+
       try {
-        const response = await fetch(CSV_FILE);
+        const response = await fetch(csvFile);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const text = await response.text();
@@ -537,25 +765,33 @@
         uniqueHousesEl.textContent = String(houseCounts.length);
         uniqueAncestriesEl.textContent = String(ancestryCounts.length);
 
-        renderBars(houseBarsEl, houseCounts, "house");
+        renderHousePieChart(houseBarsEl, houseCounts);
         renderBars(ancestryBarsEl, ancestryCounts, "ancestry");
         renderFilters();
+        searchInput.value = "";
         updateTable();
 
-        searchInput.addEventListener("input", updateTable);
-        houseFilter.addEventListener("change", updateTable);
-        ancestryFilter.addEventListener("change", updateTable);
+        if (!listenersBound) {
+          searchInput.addEventListener("input", updateTable);
+          houseFilter.addEventListener("change", updateTable);
+          ancestryFilter.addEventListener("change", updateTable);
+          dataSourceEl.addEventListener("change", () => {
+            loadDashboard(dataSourceEl.value);
+          });
+          listenersBound = true;
+        }
 
         statusEl.hidden = true;
         dashboardEl.hidden = false;
       } catch (err) {
         statusEl.className = "panel error";
         statusEl.textContent =
-          `Could not load ${CSV_FILE}. Start a local server in this folder and open the HTML via http://localhost. Error: ${err.message}`;
+          `Could not load ${csvFile}. Start a local server in this folder and open the HTML via http://localhost. Error: ${err.message}`;
+        dashboardEl.hidden = true;
       }
     }
 
-    init();
+    loadDashboard(dataSourceEl.value || DEFAULT_CSV);
   </script>
 </body>
 </html>
