@@ -3,7 +3,7 @@ from pathlib import Path
 
 import requests
 
-# I linked the API url and endpoint to the students endpoint in order to get the students data.
+# I linked the HP-API url and endpoint to the students endpoint in order to get the students data.
 API_URL = "https://hp-api.onrender.com/api/characters/students"
 OUTPUT_CSV = Path(__file__).resolve().parent / "hp_students_cleaned.csv"
 OUTPUT_ALL_CSV = Path(__file__).resolve().parent / "hp_students_all.csv"
@@ -42,6 +42,7 @@ def main() -> None:
         print(f"Name: {name}, House: {house}, Ancestry: {ancestry}")
         complete_rows.append(row)
 # I then saved the data to two separate CSV files. One of all the students and one of the complete rows.
+# I wanted to create a clean version of the dataset that only showed students with all three fields, but still keep the original dataset.
     with open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=["name", "house", "ancestry"])
         writer.writeheader()
@@ -56,6 +57,6 @@ def main() -> None:
     print(f"Saved {len(all_rows)} total rows to {OUTPUT_ALL_CSV}")
     print(f"Skipped {skipped} rows missing at least one field.")
 
-
+# I then ran the script to save the data to the CSV files.
 if __name__ == "__main__":
     main()
