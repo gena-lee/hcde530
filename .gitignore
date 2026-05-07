@@ -1,1 +1,11 @@
 .DS_Store
+.venv/
+.vscode/
+
+# Secrets and generated caches (match folder renames: "A5:" vs "A5 ")
+**/.env
+**/rq3_chart100_df.pkl
+**/rq3_artists_df.pkl
+
+__pycache__/
+*.py[cod]
