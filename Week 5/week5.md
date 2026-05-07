@@ -56,9 +56,7 @@ I chose **Last.fm** because it exposes structured endpoints for **charts, tags, 
 
 ---
 
-## C6 — Data Visualization
-
-**What counts:** At least one chart from Python (**matplotlib**, seaborn, or **`pandas.plot`**); **justify chart type**; notebook on **GitHub** with code, output, and explanation.
+## C6 — Data Visualization (additional work)
 
 **What I did:** In **`mp1.ipynb`** I use **`matplotlib`** (`fig, ax = plt.subplots`, **`ax.barh`**) for **RQ2** (top tags by **`reach`**) and **RQ3** (top tags by median plays per listener). **Horizontal bars** fit **many categories** and **long tag names**—vertical bars would crowd labels; pie charts would wrongly imply parts of a whole.
 
