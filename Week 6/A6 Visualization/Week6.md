@@ -8,6 +8,14 @@ The analysis focuses on three questions: which top artists appear by profile cou
 
 ---
 
+## Chart Justifications
+
+- **RQ1 — Top artists by profile country:** I used a horizontal bar chart because artist names are easier to read on the y-axis, and the bars make listener counts easy to compare within each country. For country overlap, I used a country-pair similarity chart so each pair appears once and the reader can quickly see that the United States and South Korea overlap the most.
+- **RQ2 — Global genres by reach:** I used a horizontal bar chart because the question is about ranking genres from highest to lowest reach. This chart helps the reader see that rock has the widest reach among the Last.fm genre tags in my dataset.
+- **RQ3 — Play-to-listener ratio by genre:** I used a horizontal bar chart because it clearly ranks the five genres with the highest median play-to-listener ratios. This helps the reader compare play intensity across genres and see that R&B has the highest ratio in the top global artist sample.
+
+---
+
 ## C3 — Data Cleaning and File Handling
 
 I loaded a nested JSON file, `Last.fm_Data.json`, and converted specific sections of it into pandas DataFrames. I cleaned columns such as `@attr.rank`, `listeners`, `reach`, and play-to-listener metrics by renaming fields and converting values to numeric types before graphing.
