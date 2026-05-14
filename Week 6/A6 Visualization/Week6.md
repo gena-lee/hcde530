@@ -16,18 +16,6 @@ The analysis focuses on three questions: which top artists appear by profile cou
 
 ---
 
-## C3 — Data Cleaning and File Handling
-
-I loaded a nested JSON file, `Last.fm_Data.json`, and converted specific sections of it into pandas DataFrames. I cleaned columns such as `@attr.rank`, `listeners`, `reach`, and play-to-listener metrics by renaming fields and converting values to numeric types before graphing.
-
----
-
-## C5 — Data Analysis with Pandas
-
-I used pandas to answer three research questions about Last.fm listening patterns. I filtered top artists by country, compared country pairs using overlap and Jaccard similarity, ranked global genres by `reach`, and sorted genres by median play-to-listener ratio.
-
----
-
 ## C6 — Data Visualization
 
 I created Python-generated Plotly charts to communicate the main findings from the dataset. I used horizontal bar charts for ranked categories because artist and genre names are easier to read that way, and I used a country-pair similarity chart to show which profile countries shared the most top artists.
