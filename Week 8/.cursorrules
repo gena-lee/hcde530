@@ -1,0 +1,63 @@
+# Project Context
+You are working in a beginner-friendly HCDE coursework project.
+
+# Project Context Profile
+- Practitioner background: HCD practitioner (not a software engineer), working in UX research/UX design contexts.
+- Project: Mini Project 2 — Type System Builder. A browser-based tool that helps users find, pair, and preview fonts, then export a complete type system for use in brand or design work.
+- Primary goal: Let users build a type system (typeface, weight, size scale, use case) within ~30 minutes, without feeling overwhelmed.
+- Primary audience: Anyone working on a design project — designers, students, and people working on personal brands. Users may have no design or coding background.
+- Coding style preference: Beginner-friendly explanations and code style.
+- Implementation preference: Balance clarity and compactness.
+- Error-handling preference: Fail fast with clear, actionable error messages.
+- Dependency preference: Default to dependency-free solutions. No npm, no build tools, no frameworks unless explicitly requested.
+
+# Tech Stack
+- Single standalone HTML file with embedded CSS and vanilla JavaScript.
+- Google Fonts API for fetching font data and loading font previews via embed links.
+- No backend, no login, no server required — runs by opening the HTML file in a browser.
+- API key (if required) stored in a `.env` file and never committed to version control.
+
+# UI and UX Conventions
+- Present one decision at a time to avoid decision paralysis. Do not show all options at once.
+- Use clear labels, headings, and helper text so users always know what step they are on.
+- Filters (typeface category, mood, use case, weight) should narrow options progressively.
+- Font pairing suggestions appear after a primary font is selected — not before.
+- A "Preview this pairing" button renders the live preview; do not auto-preview on every filter change.
+- Preview sample text is always consistent: a title (brand name), a heading (short tagline), and body copy (1–2 sentences). Never use random or lorem ipsum text.
+- The exported type system includes: primary typeface, paired typeface, weights, size scale, and use case labels (display, heading, body, caption).
+
+# Font Preview
+- Load fonts using Google Fonts embed URLs (e.g. `https://fonts.googleapis.com/css2?family=...`).
+- Apply fonts via inline `style` attributes or dynamically injected `<link>` tags — no separate CSS files.
+- Preview renders in the browser using the actual typefaces, not images.
+
+# Directory Structure
+Keep this section and the directory tree current whenever files are added, removed, or renamed.
+
+HCDE 530 Week 8 — Mini Project 2/
+- `.cursorrules` (Cursor AI guidance and rules)
+- `mp2_project_declaration.md` (project declaration)
+- `index.html` (standalone Type System Builder app)
+
+# Project Conventions
+- Prefer simple, readable code over clever one-liners.
+- Explain changes in plain language suitable for someone learning to code.
+- Keep scripts self-contained and easy to run locally (open HTML file in browser).
+- Prioritize beginner readability while avoiding unnecessary verbosity.
+- Keep defaults aligned to the Project Context Profile unless the user asks to override.
+
+# For HTML/CSS/JS Files
+- Use clear variable and function names (`selectedFont`, `pairingList`, `renderPreview`, etc.).
+- Add short comments for non-obvious logic only — do not narrate what every line does.
+- Avoid adding external libraries unless explicitly requested.
+- Preserve existing behavior unless the request asks for functional changes.
+- Default UI to high-level, step-by-step flow; add advanced options only on request.
+
+# For API Work
+- Validate that the API call succeeds before rendering results; show a clear error if it fails.
+- Do not silently ignore empty or malformed API responses.
+- Keep API key out of the HTML file; load from `.env` if needed and note in comments.
+
+# When Unsure
+- Ask one concise clarifying question before large structural changes.
+- If project files are added, removed, or renamed, update the # Directory Structure section above.
