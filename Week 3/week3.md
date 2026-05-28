@@ -21,9 +21,11 @@ Analysis script:
 
 This work demonstrates C2 through reading, debugging, and documenting Python data-processing code. I identified logic and runtime issues in `week3_analysis_buggy.py` (for example, numeric parsing failures and incorrect top-5 sorting), updated the script with clearer function structure, and added documentation such as a function docstring and this written project summary.
 
-### C5: Data Cleaning and Preparation
+### C3: Data Cleaning and File Handling
 
-This work demonstrates C5 through systematic cleaning of a messy CSV dataset. I removed invalid rows with missing participant names, standardized categorical values (`role`, `department`, and `primary_tool`), corrected malformed numeric values (such as `fifteen` to `15`), and produced cleaned outputs (`responses_cleaned.csv` and `week3_survey_cleaned.csv`) ready for analysis.
+This work demonstrates C3 through systematic cleaning of a messy CSV dataset. I removed invalid rows with missing participant names, standardized categorical values (`role`, `department`, and `primary_tool`), corrected malformed numeric values (such as `fifteen` to `15`). From there, I produced cleaned outputs (`responses_cleaned.csv` and `week3_survey_cleaned.csv`) ready for analysis.
+
+Debugging `week3_analysis_buggy.py` showed me that cleaning the CSV and getting correct analysis are separate steps. After I cleaned the files, the script still had to be fixed——it could crash on bad numbers and, even when it ran, the top 5 satisfaction scores were wrong until I fixed the sort. I learned that "no errors" does not mean "correct answers," so I should always check the final output, not only whether the script finishes.
 
 ## Data Cleaning Steps
 
