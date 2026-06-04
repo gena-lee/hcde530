@@ -661,19 +661,13 @@
     .step-panel { display: none; }
     .step-panel.active {
       display: block;
-      animation: page-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: page-slide-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
     #panel-1.active { display: grid; }
 
-    @keyframes page-fade-in {
-      from {
-        opacity: 0;
-        transform: translateY(24px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    @keyframes page-slide-up {
+      from { transform: translateY(28px); }
+      to   { transform: translateY(0); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1950,10 +1944,15 @@ const state = {
 // ================================================================
 
 function dismissWelcome() {
-  localStorage.setItem('tsb_welcomed', '1');
   document.getElementById('welcome-overlay').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   if (!allFonts.length) bootstrap();
+
+  // Re-trigger panel 1's slide-up entrance
+  const panel1 = document.getElementById('panel-1');
+  panel1.style.animation = 'none';
+  void panel1.offsetWidth;
+  panel1.style.animation = '';
 }
 
 function goToWelcome() {
@@ -3011,13 +3010,8 @@ function escHtml(str) {
 //  INIT
 // ================================================================
 
-// Returning users skip the welcome screen and land directly in the app
-if (localStorage.getItem('tsb_welcomed') === '1') {
-  document.getElementById('welcome-overlay').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  bootstrap();
-}
-// First-time visitors see the welcome overlay; dismissWelcome() chains them into the app
+// Welcome overlay is always the home page on every load.
+// User dismisses it via "Start building" → dismissWelcome() chains into the app.
 </script>
 </body>
 </html>
