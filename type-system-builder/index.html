@@ -1,0 +1,2996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fontface</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@1,400;1,500;1,600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:             #f5f3ef;
+      --surface:        #ffffff;
+      --surface-2:      #eeece8;
+      --border:         #dedad3;
+      --text:           #1c1b19;
+      --text-muted:     #7a7570;
+      --accent:         #2b3055;
+      --accent-hover:   #3c4475;
+      --step-active-bg: #2b3055;
+      --step-done-bg:   #8097b5;
+      --step-future-bg: #c8c4bc;
+      --tag-bg:         #e6e3dd;
+      --radius:         7px;
+      --radius-lg:      11px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ── WELCOME OVERLAY ─────────────────────────────────────── */
+
+    #welcome-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1100;
+      padding: 40px 24px;
+      overflow-y: auto;
+    }
+
+    .welcome-card {
+      max-width: 720px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .welcome-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .welcome-hero {
+      font-size: 112px;
+      line-height: 1;
+      color: var(--text);
+      margin-bottom: 26px;
+    }
+
+    .welcome-hero .wh-font {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 0.82em;
+      letter-spacing: -3.5px;
+    }
+
+    .welcome-hero .wh-face {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      letter-spacing: -1.5px;
+      color: var(--accent);
+      margin-left: 4px;
+    }
+
+    .welcome-hero .wh-caret {
+      display: inline-block;
+      width: 4px;
+      height: 0.78em;
+      background: var(--accent);
+      margin-left: 10px;
+      vertical-align: baseline;
+      border-radius: 1px;
+      transform: skewX(-12deg);
+      transform-origin: bottom center;
+      animation: caret-blink 1.05s steps(2, start) infinite;
+    }
+
+    @keyframes caret-blink {
+      to { visibility: hidden; }
+    }
+
+    /* Welcome content soft entrance */
+    @keyframes welcome-rise {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .welcome-eyebrow,
+    .welcome-hero,
+    .welcome-tagline,
+    .welcome-sub,
+    .welcome-cta,
+    .welcome-footer {
+      animation: welcome-rise 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .welcome-eyebrow { animation-delay: 0.05s; }
+    .welcome-hero    { animation-delay: 0.18s; }
+    .welcome-tagline { animation-delay: 0.38s; }
+    .welcome-sub     { animation-delay: 0.50s; }
+    .welcome-cta     { animation-delay: 0.66s; }
+    .welcome-footer  { animation-delay: 0.80s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .welcome-hero .wh-caret { animation: none; }
+      .welcome-eyebrow,
+      .welcome-hero,
+      .welcome-tagline,
+      .welcome-sub,
+      .welcome-cta,
+      .welcome-footer {
+        animation: none;
+      }
+    }
+
+    .welcome-tagline {
+      font-size: 19px;
+      line-height: 1.5;
+      color: var(--text);
+      max-width: 520px;
+      margin: 0 auto 14px;
+      font-weight: 400;
+    }
+
+    .welcome-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+
+    .welcome-cta {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 16px 36px;
+      border-radius: 100px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      letter-spacing: 0.2px;
+    }
+
+    .welcome-cta:hover { background: var(--accent-hover); }
+    .welcome-cta:active { transform: translateY(1px); }
+
+    .welcome-footer {
+      margin-top: 36px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .welcome-footer a {
+      color: var(--text-muted);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .welcome-footer a:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .welcome-hero { font-size: 72px; }
+      .welcome-hero .wh-font { letter-spacing: -3px; }
+      .welcome-hero .wh-face { letter-spacing: -1.5px; }
+      .welcome-tagline { font-size: 16px; }
+    }
+
+    /* ── SHARED BUTTONS ──────────────────────────────────────── */
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── HEADER ──────────────────────────────────────────────── */
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      height: 54px;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: baseline;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+      line-height: 1;
+      transition: opacity 0.15s;
+    }
+
+    .logo:hover { opacity: 0.78; }
+
+    .logo .lg-font {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 0.85em;
+      letter-spacing: -0.5px;
+    }
+
+    .logo .lg-face {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      letter-spacing: -0.4px;
+      color: var(--accent);
+      margin-left: 1px;
+    }
+
+
+    /* ── HEADER STEP BAR ─────────────────────────────────────── */
+
+    .step-bar {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-item.active .step-num  { background: var(--accent);         color: #fff; }
+    .step-item.done   .step-num  { background: var(--step-done-bg);   color: #fff; }
+    .step-item.future .step-num  { background: var(--step-future-bg); color: #fff; }
+
+    .step-lbl {
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .step-item.active .step-lbl { color: var(--accent); }
+    .step-item.future .step-lbl { color: var(--text-muted); }
+    .step-item.done   { cursor: pointer; }
+    .step-item.done:hover .step-lbl { color: var(--accent); }
+
+    .step-sep {
+      width: 24px;
+      height: 1px;
+      background: var(--border);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── STEP TITLE AREA ─────────────────────────────────────── */
+
+    #step-progress {
+      background: var(--bg);
+    }
+
+    .sp-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 28px 80px 24px;
+    }
+
+    .sp-counter {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .sp-heading {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .sp-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      max-width: 540px;
+    }
+
+    /* ── LAYOUT ──────────────────────────────────────────────── */
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 780px);
+      align-items: start;
+      gap: 28px;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 36px 80px 120px;
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────────────── */
+
+    .sidebar {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 18px 24px;
+      margin-top: 44px;
+    }
+
+    .sidebar-section {
+      margin-bottom: 22px;
+    }
+
+    .sidebar-section + .sidebar-section {
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 32px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      background: var(--surface-2);
+      color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(43,48,85,0.1);
+    }
+
+    .search-input::placeholder { color: var(--text-muted); }
+
+    /* Category pills */
+    .cat-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .section-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 10px;
+      margin-top: -4px;
+    }
+
+    /* Tag chips */
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      background: var(--tag-bg);
+      color: var(--text-muted);
+      border: 1.5px solid transparent;
+      transition: all 0.12s;
+      user-select: none;
+      line-height: 1.4;
+    }
+
+    .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+    .chip.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .clear-btn {
+      display: inline-block;
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0;
+      margin-top: 6px;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .clear-btn:hover { color: var(--accent); }
+
+    /* ── RESULTS AREA ────────────────────────────────────────── */
+
+    .results-area {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .results-count {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .sort-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .sort-row select {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 4px 8px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    /* ── FONT GRID ───────────────────────────────────────────── */
+
+    .font-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 11px;
+      align-content: start;
+    }
+
+    /* ── FONT CARD ───────────────────────────────────────────── */
+
+    .font-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 18px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      position: relative;
+      text-align: left;
+    }
+
+    .font-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 2px 14px rgba(43,48,85,0.09);
+      transform: translateY(-1px);
+    }
+
+    .font-card:active { transform: translateY(0); }
+
+    .card-cat {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 100px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .card-name-display {
+      font-size: 26px;
+      line-height: 1.15;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .card-abc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: -4px;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text-muted);
+      flex: 1;
+    }
+
+    .card-weights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .card-weight {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    /* ── SKELETON ────────────────────────────────────────────── */
+
+    .skel {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.55; }
+      50%       { opacity: 1; }
+    }
+
+    .skel-line {
+      background: var(--surface-2);
+      border-radius: 4px;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    /* ── EMPTY / ERROR ───────────────────────────────────────── */
+
+    .empty-state, .error-state {
+      grid-column: 1 / -1;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .empty-state h3 { font-size: 15px; margin-bottom: 6px; }
+    .empty-state p  { font-size: 13px; color: var(--text-muted); }
+
+    .error-state p {
+      font-size: 13px;
+      color: #c0392b;
+      background: #fdf0ef;
+      border: 1px solid #f5c6c2;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      display: inline-block;
+    }
+
+    /* ── STEP PANELS ────────────────────────────────────────── */
+
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+    #panel-1.active { display: grid; }
+
+    /* ── STEP 2 + 3 shared ───────────────────────────────────── */
+
+    .step-scroll { display: contents; }
+
+    .step-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 36px 80px 100px;
+    }
+
+    /* ── STEP 3 — choose pairing ─────────────────────────────── */
+
+    .primary-highlight {
+      border-left: 3px solid var(--accent);
+      padding: 6px 0 6px 20px;
+      margin-bottom: 36px;
+    }
+
+    .primary-role {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .primary-font-name {
+      font-size: 32px;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .primary-font-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .pairing-intro-text {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 24px;
+      max-width: 620px;
+    }
+
+    .pairing-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 11px;
+    }
+
+    .step-back {
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.13s;
+    }
+
+    .step-back:hover { color: var(--accent); }
+
+    /* ── STEP 3 — type system preview ────────────────────────── */
+
+    .pair-summary {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .pair-summary-card {
+      flex: 1;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+    }
+
+    .pair-summary-role {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .pair-summary-name {
+      font-size: 22px;
+      line-height: 1.15;
+    }
+
+    .pair-summary-cat {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .specimen-block {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 40px;
+      margin-bottom: 16px;
+    }
+
+    .specimen-h1 { font-size: 48px; line-height: 1.1; margin-bottom: 10px; }
+    .specimen-h2 { font-size: 30px; line-height: 1.2; margin-bottom: 16px; }
+    .specimen-body {
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--text-muted);
+      max-width: 620px;
+    }
+
+    .scale-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 36px;
+    }
+
+    .scale-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .scale-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    .scale-table tr:last-child td { border-bottom: none; }
+
+    .scale-preview { display: block; color: var(--text); }
+
+    .scale-meta { font-size: 11px; color: var(--text-muted); }
+
+    .step3-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-secondary {
+      background: none;
+      border: 1.5px solid var(--border);
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: border-color 0.13s, color 0.13s;
+    }
+
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .step2-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* Hero card — selected primary font */
+    .hero-card {
+      background: var(--surface);
+      border: 1.5px solid var(--accent);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 12px rgba(43,48,85,0.08);
+    }
+
+    .hero-preview {
+      font-size: 52px;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hero-sample {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .hero-badge {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 100px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    /* Pairing grid */
+    .pairing-intro {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.55;
+    }
+
+    .pairing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .pairing-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+      cursor: pointer;
+    }
+
+    .pairing-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 2px 14px rgba(43,48,85,0.09);
+      transform: translateY(-1px);
+    }
+
+    .pair-specimen {
+      flex: 1;
+    }
+
+    .pair-headline {
+      font-size: 22px;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .pair-rule {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 10px;
+    }
+
+    .pair-body {
+      font-size: 12px;
+      line-height: 1.65;
+      color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .pair-info {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .pair-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .pair-cat {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 100px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .pair-select {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 7px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.13s;
+      width: 100%;
+    }
+
+    .pair-select:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── SELECTION BAR ───────────────────────────────────────── */
+
+    #selection-bar {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #141829;
+      color: #fff;
+      border-radius: 18px;
+      padding: 14px 14px 14px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 28px rgba(43,48,85,0.32);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+      z-index: 200;
+    }
+
+    #selection-bar.visible {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .sel-bar-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sel-bar-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      opacity: 0.55;
+    }
+
+    #sel-bar-name {
+      font-size: 15px;
+      font-weight: 600;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sel-bar-cta {
+      background: #fff;
+      color: #141829;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 22px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.13s;
+      flex-shrink: 0;
+    }
+
+    .sel-bar-cta:hover { background: var(--bg); }
+
+    .sel-bar-dismiss {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.45);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 0 2px;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: color 0.13s;
+    }
+
+    .sel-bar-dismiss:hover { color: #fff; }
+
+    /* ── SELECTED CARD (inverted) ────────────────────────────── */
+
+    .font-card.selected {
+      background: #141829;
+      border-color: #141829;
+      box-shadow: 0 4px 20px rgba(20,24,41,0.28);
+      transform: translateY(-1px);
+    }
+
+    .font-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 11px;
+      right: 11px;
+      width: 20px;
+      height: 20px;
+      background: rgba(255,255,255,0.9);
+      color: #141829;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 20px;
+      text-align: center;
+    }
+
+    .font-card.selected .card-name-display { color: #fff; }
+
+    .font-card.selected .card-abc,
+    .font-card.selected .card-desc { color: rgba(255,255,255,0.55); }
+
+    .font-card.selected .card-cat {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.75);
+    }
+
+    .font-card.selected .card-weight {
+      background: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* ── STEP 4 — live preview ───────────────────────────────── */
+
+    /* Two-column layout for step 4 */
+    .step4-layout {
+      display: grid;
+      grid-template-columns: 140px minmax(0, 1fr);
+      gap: 36px;
+      align-items: start;
+    }
+
+    .step4-sidebar {
+      padding: 0;
+      position: sticky;
+      top: 20px;
+    }
+
+    .step4-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .ctrl-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ctrl-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .theme-btns {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .step4-sidebar .font-select-pill {
+      width: 100%;
+    }
+
+    .step4-sidebar .size-wrap {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .step4-sidebar input[type="range"].size-slider {
+      width: 100%;
+    }
+
+    .ctrl-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .theme-btns { display: flex; gap: 5px; }
+
+    .theme-btn {
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: none;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      transition: all 0.12s;
+    }
+
+    .theme-btn.active {
+      background: var(--text);
+      color: #fff;
+      border-color: var(--text);
+    }
+
+    .preview-text-input {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 6px 11px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--text);
+      background: var(--bg);
+      width: 200px;
+      min-width: 0;
+      transition: border-color 0.15s;
+    }
+
+    .preview-text-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .font-select-pill {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 5px 28px 5px 13px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a7570' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 11px center;
+      cursor: pointer;
+    }
+
+    .font-select-pill:focus { outline: none; border-color: var(--accent); }
+
+    .size-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .size-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      min-width: 48px;
+    }
+
+    input[type="range"].size-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 120px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"].size-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    input[type="range"].size-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+    }
+
+    /* Preview card */
+
+    .preview-card {
+      background: transparent;
+      margin-bottom: 24px;
+      transition: background 0.2s;
+    }
+
+    .preview-card[data-theme="dark"] { background: #141829; border-radius: var(--radius-lg); overflow: hidden; }
+
+    .preview-section {
+      padding: 32px 40px 28px;
+    }
+
+    .preview-card[data-theme="light"] .preview-section { border-bottom: 1px solid var(--border); }
+    .preview-card[data-theme="dark"]  .preview-section { border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .preview-section:last-child { border-bottom: none; }
+
+    .preview-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .preview-meta-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .preview-card[data-theme="light"] .preview-meta-lbl { color: var(--text-muted); }
+    .preview-card[data-theme="dark"]  .preview-meta-lbl { color: rgba(255,255,255,0.35); }
+
+    .preview-section {
+      overflow: hidden;
+    }
+
+    .preview-editable {
+      outline: none;
+      cursor: text;
+      transition: color 0.2s;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .preview-editable:focus { box-shadow: none; }
+
+    .preview-card[data-theme="light"] .preview-editable { color: #1c1b19; }
+    .preview-card[data-theme="dark"]  .preview-editable { color: #f0eeea; }
+
+    .prev-display { font-size: 56px; line-height: 1.15; letter-spacing: -1.5px; font-weight: 700; }
+    .prev-heading { font-size: 32px; line-height: 1.3;  letter-spacing: -0.3px; font-weight: 400; }
+    .prev-body    { font-size: 16px; line-height: 1.75; font-weight: 400; max-width: 680px; }
+    .prev-caption { font-size: 12px; line-height: 1.6;  font-weight: 400; color: inherit; opacity: 0.65; max-width: 580px; }
+
+    /* ── STEP 5 — type system summary ───────────────────────── */
+
+    .ts-pair-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .ts-font-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px 20px;
+    }
+
+    .ts-font-role {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .ts-font-name {
+      font-size: 34px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ts-font-abc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .ts-font-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Scale chart */
+
+    .scale-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .scale-chart {
+      margin-bottom: 36px;
+      border-top: 1px solid var(--border);
+    }
+
+    .scale-header,
+    .scale-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 70px 95px 175px 165px;
+      border-bottom: 1px solid var(--border);
+      align-items: stretch;
+    }
+
+    .scale-th {
+      padding: 12px 18px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: transparent;
+      display: flex;
+      align-items: center;
+    }
+
+    .scale-preview-col {
+      padding: 16px 18px 16px 0;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .scale-preview-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+      color: var(--text);
+    }
+
+    .scale-data-col {
+      padding: 12px 18px;
+      font-size: 13px;
+      color: var(--text);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── EXPORT BUTTONS + MODAL ──────────────────────────────── */
+
+    .export-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 24, 41, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      padding: 20px;
+    }
+
+    .modal-overlay.visible { display: flex; }
+
+    .modal-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      max-width: 720px;
+      width: 100%;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 6px;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal-body {
+      overflow-y: auto;
+      padding: 0;
+      flex: 1;
+      background: #1c1f33;
+    }
+
+    .code-block {
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #e6e4ee;
+      padding: 22px 24px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .copy-status {
+      font-size: 12px;
+      color: var(--step-done-bg);
+      margin-right: 8px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .copy-status.visible { opacity: 1; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── WELCOME OVERLAY ───────────────────────────────────────── -->
+<div id="welcome-overlay">
+  <div class="welcome-card">
+    <div class="welcome-eyebrow">A Type System Builder</div>
+    <h1 class="welcome-hero"><span class="wh-font">Font</span><span class="wh-face">face</span><span class="wh-caret" aria-hidden="true"></span></h1>
+    <p class="welcome-tagline">Build beautiful type systems in five guided steps.</p>
+    <p class="welcome-sub">
+      Pick a primary font, find pairings, preview your hierarchy with real text,
+      and export ready-to-use CSS. All in your browser — no signup required.
+    </p>
+
+    <button class="welcome-cta" onclick="dismissWelcome()">Start building →</button>
+
+    <div class="welcome-footer">
+      Powered by the <a href="https://fonts.google.com" target="_blank" rel="noopener">Google Fonts API</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ──────────────────────────────────────────────── -->
+<div id="app" style="display:none;">
+
+  <!-- Header -->
+  <header>
+    <button class="logo" onclick="goToWelcome()" aria-label="Fontface — return to start">
+      <span class="lg-font">Font</span><span class="lg-face">face</span>
+    </button>
+    <nav class="step-bar" aria-label="Steps" id="header-steps">
+      <!-- populated by updateStepProgress() -->
+    </nav>
+  </header>
+
+  <!-- Step progress bar -->
+  <div id="step-progress">
+    <div class="sp-inner" id="sp-inner">
+      <!-- populated by updateStepProgress() -->
+    </div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="app-shell step-panel active" id="panel-1">
+
+    <!-- Sidebar / Filters -->
+    <aside class="sidebar" aria-label="Filters">
+
+      <div class="sidebar-section">
+        <div class="section-title">Search</div>
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="6.5" cy="6.5" r="5.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/>
+          </svg>
+          <input class="search-input" type="text" id="search-input"
+                 placeholder="Font name…" autocomplete="off" oninput="handleSearch()">
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Category</div>
+        <div class="cat-list" id="cat-list"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Mood</div>
+        <div class="section-sub">What feeling should your typeface carry?</div>
+        <div class="chip-list" id="mood-chips"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Use Case</div>
+        <div class="section-sub">What will this type system primarily be used for?</div>
+        <div class="chip-list" id="usecase-chips"></div>
+      </div>
+
+      <div class="sidebar-section" style="border-top:none; padding-top:0;">
+        <button class="clear-btn" onclick="clearFilters()">Clear all filters</button>
+      </div>
+
+    </aside>
+
+    <!-- Results -->
+    <main class="results-area" aria-live="polite">
+      <div class="results-header">
+        <span class="results-count" id="results-count">Loading fonts…</span>
+        <div class="sort-row">
+          Sort
+          <select id="sort-select" onchange="applyFilters()">
+            <option value="popularity">Popularity</option>
+            <option value="alpha">A → Z</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="font-grid" id="font-grid"></div>
+    </main>
+
+  </div><!-- /panel-1 -->
+
+  <!-- Step 2: unused (selection happens in panel-1) -->
+  <div class="step-panel" id="panel-2"></div>
+
+  <!-- Step 3: Choose pairing -->
+  <div class="step-panel" id="panel-3">
+    <div class="step-scroll">
+      <div class="step-inner" id="step3-content">
+        <!-- populated by renderPairings() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: type system preview -->
+  <div class="step-panel" id="panel-4">
+    <div class="step-scroll">
+      <div class="step-inner" id="step4-content">
+        <!-- populated by renderTypeSystem() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5 placeholder -->
+  <!-- Step 5: type system summary + scale chart -->
+  <div class="step-panel" id="panel-5">
+    <div class="step-scroll">
+      <div class="step-inner" id="step5-content">
+        <!-- populated by renderStep5() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Selection bar -->
+  <div id="selection-bar" role="status" aria-live="polite">
+    <div class="sel-bar-text">
+      <span class="sel-bar-label">Selected</span>
+      <span id="sel-bar-name"></span>
+    </div>
+    <button class="sel-bar-cta" id="sel-bar-cta">Find pairings →</button>
+    <button class="sel-bar-dismiss" onclick="clearSelection()" aria-label="Clear selection">×</button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- Export CSS modal -->
+<div class="modal-overlay" id="css-modal" onclick="if(event.target===this)closeCSSModal()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-title">CSS Code</span>
+      <button class="modal-close" onclick="closeCSSModal()" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <pre class="code-block" id="css-code"></pre>
+    </div>
+    <div class="modal-footer">
+      <span class="copy-status" id="copy-status">Copied to clipboard</span>
+      <button class="btn-secondary" onclick="downloadCSS()">Download .css</button>
+      <button class="btn-primary" onclick="copyCSS()">Copy</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ================================================================
+//  FONT METADATA  — mood + use-case tags for ~80 popular families
+// ================================================================
+
+const MOOD_DEFS = {
+  playful:   'Playful',
+  minimal:   'Minimal',
+  editorial: 'Editorial',
+  elegant:   'Elegant',
+  bold:      'Bold',
+  modern:    'Modern',
+  classic:   'Classic',
+  quirky:    'Quirky',
+  clean:     'Clean',
+  warm:      'Warm',
+};
+
+const USECASE_DEFS = {
+  'branding':  'Branding',
+  'body-text': 'Body Text',
+  'display':   'Display',
+  'ui-app':    'UI / Apps',
+};
+
+// Tag fallbacks for fonts without explicit FONT_META — derived from category
+const CATEGORY_DEFAULT_TAGS = {
+  'serif':       { m: ['classic'],   u: ['body-text'] },
+  'sans-serif':  { m: ['minimal'],   u: ['body-text', 'ui-app'] },
+  'display':     { m: ['bold'],      u: ['display'] },
+  'handwriting': { m: ['playful'],   u: ['branding'] },
+  'monospace':   { m: ['clean'],     u: ['ui-app'] },
+};
+
+// Category contrast rules — which categories pair well together
+const COMPLEMENTARY_CATEGORIES = {
+  'serif':       ['sans-serif'],
+  'sans-serif':  ['serif', 'display'],
+  'display':     ['sans-serif', 'serif'],
+  'handwriting': ['sans-serif'],
+  'monospace':   ['serif', 'sans-serif'],
+};
+
+const FONT_META = {
+  // Sans-serif
+  "Roboto":             { m: ["minimal","clean","modern"],     u: ["ui-app","body-text","branding"] },
+  "Open Sans":          { m: ["minimal","warm","modern"],      u: ["body-text","ui-app"] },
+  "Lato":               { m: ["minimal","modern","warm"],      u: ["body-text","branding","ui-app"] },
+  "Montserrat":         { m: ["modern","bold","minimal"],      u: ["display","branding"] },
+  "Raleway":            { m: ["elegant","modern","minimal"],   u: ["display","branding","body-text"] },
+  "Oswald":             { m: ["bold","modern","editorial"],    u: ["display","branding"] },
+  "Poppins":            { m: ["modern","minimal","warm"],      u: ["branding","ui-app","display"] },
+  "Nunito":             { m: ["playful","warm","modern"],      u: ["ui-app","branding"] },
+  "Work Sans":          { m: ["minimal","clean","modern"],     u: ["ui-app","body-text","branding"] },
+  "Inter":              { m: ["clean","minimal","modern"],     u: ["ui-app","body-text","branding"] },
+  "Source Sans 3":      { m: ["clean","minimal","modern"],     u: ["ui-app","body-text","branding"] },
+  "Cabin":              { m: ["modern","warm","minimal"],      u: ["ui-app","body-text","branding"] },
+  "Josefin Sans":       { m: ["elegant","minimal","modern"],   u: ["display","branding","body-text"] },
+  "Quicksand":          { m: ["playful","warm","modern"],      u: ["ui-app","branding"] },
+  "DM Sans":            { m: ["minimal","modern","warm"],      u: ["ui-app","body-text","branding"] },
+  "Plus Jakarta Sans":  { m: ["modern","minimal","warm"],      u: ["ui-app","branding","body-text"] },
+  "Manrope":            { m: ["minimal","modern","clean"],     u: ["ui-app","body-text","branding"] },
+  "Outfit":             { m: ["modern","minimal","playful"],   u: ["ui-app","branding"] },
+  "Mulish":             { m: ["minimal","modern","warm"],      u: ["ui-app","body-text","branding"] },
+  "Karla":              { m: ["minimal","warm","modern"],      u: ["body-text","ui-app"] },
+  "Jost":               { m: ["minimal","modern","elegant"],   u: ["branding","display","ui-app"] },
+  "Urbanist":           { m: ["modern","minimal","elegant"],   u: ["branding","ui-app","display"] },
+  "Rubik":              { m: ["playful","modern","warm"],      u: ["ui-app","branding"] },
+  "Barlow":             { m: ["modern","minimal","editorial"], u: ["body-text","ui-app"] },
+  "Barlow Condensed":   { m: ["modern","bold","editorial"],    u: ["display","branding"] },
+  "Exo 2":              { m: ["modern","clean","bold"],        u: ["display","ui-app","branding"] },
+  "Noto Sans":          { m: ["minimal","modern","clean"],     u: ["ui-app","body-text","branding"] },
+  "Hind":               { m: ["minimal","warm","modern"],      u: ["body-text","ui-app","branding"] },
+  "Space Grotesk":      { m: ["modern","clean","bold"],        u: ["branding","ui-app","display"] },
+  "Geologica":          { m: ["modern","clean","minimal"],     u: ["ui-app","branding","body-text"] },
+  "Unbounded":          { m: ["bold","modern","clean"],        u: ["display","branding"] },
+  "Syne":               { m: ["modern","bold","quirky"],       u: ["display","branding"] },
+  // Serif
+  "Merriweather":       { m: ["classic","warm","editorial"],   u: ["body-text"] },
+  "Playfair Display":   { m: ["elegant","classic","bold"],     u: ["display","body-text","branding"] },
+  "PT Serif":           { m: ["classic","editorial","warm"],   u: ["body-text"] },
+  "Lora":               { m: ["warm","elegant","classic"],     u: ["body-text","branding"] },
+  "Crimson Text":       { m: ["classic","elegant","warm"],     u: ["body-text"] },
+  "EB Garamond":        { m: ["classic","elegant","editorial"],u: ["body-text","branding"] },
+  "Cormorant Garamond": { m: ["elegant","classic","editorial"],u: ["body-text","branding","display"] },
+  "DM Serif Display":   { m: ["elegant","bold","classic"],     u: ["display","body-text","branding"] },
+  "Fraunces":           { m: ["elegant","quirky","warm"],      u: ["body-text","branding","display"] },
+  "Libre Baskerville":  { m: ["classic","elegant","editorial"],u: ["body-text"] },
+  "Spectral":           { m: ["elegant","classic","editorial"],u: ["body-text"] },
+  "Bitter":             { m: ["warm","classic","bold"],        u: ["body-text","display"] },
+  "Alegreya":           { m: ["classic","elegant","warm"],     u: ["body-text"] },
+  "Cardo":              { m: ["classic","elegant","editorial"],u: ["body-text"] },
+  "Vollkorn":           { m: ["classic","warm","elegant"],     u: ["body-text"] },
+  "Noto Serif":         { m: ["classic","minimal","editorial"],u: ["body-text"] },
+  "Zilla Slab":         { m: ["warm","bold","modern"],         u: ["display","body-text","branding"] },
+  // Display
+  "Abril Fatface":      { m: ["bold","playful","quirky"],      u: ["display","branding"] },
+  "Bebas Neue":         { m: ["bold","modern","editorial"],    u: ["display","branding"] },
+  "Titan One":          { m: ["bold","playful","quirky"],      u: ["display","branding"] },
+  "Anton":              { m: ["bold","editorial","modern"],    u: ["display","branding"] },
+  "Alfa Slab One":      { m: ["bold","classic","editorial"],   u: ["display","branding"] },
+  "Righteous":          { m: ["bold","playful","quirky"],      u: ["display","branding"] },
+  "Fredoka One":        { m: ["playful","bold","warm"],        u: ["display","branding"] },
+  "Lobster":            { m: ["playful","bold","warm"],        u: ["display","branding"] },
+  "Baloo 2":            { m: ["playful","warm","bold"],        u: ["ui-app","branding"] },
+  // Handwriting
+  "Dancing Script":     { m: ["playful","warm","elegant"],    u: ["branding","display"] },
+  "Pacifico":           { m: ["playful","warm","quirky"],      u: ["branding","display"] },
+  "Sacramento":         { m: ["elegant","playful","warm"],    u: ["branding","display"] },
+  "Permanent Marker":   { m: ["playful","quirky","bold"],     u: ["display","branding"] },
+  "Indie Flower":       { m: ["playful","warm","quirky"],     u: ["branding","display"] },
+  "Caveat":             { m: ["playful","warm","quirky"],     u: ["body-text","branding"] },
+  "Kalam":              { m: ["playful","warm","quirky"],     u: ["branding","display"] },
+  "Varela Round":       { m: ["playful","warm","minimal"],    u: ["ui-app","branding"] },
+  // Monospace
+  "Space Mono":         { m: ["clean","quirky","modern"],     u: ["ui-app","branding","display"] },
+  "Fira Code":          { m: ["clean","minimal"],             u: ["ui-app"] },
+  "IBM Plex Mono":      { m: ["clean","minimal","editorial"], u: ["ui-app","body-text"] },
+  "Source Code Pro":    { m: ["clean","minimal"],             u: ["ui-app"] },
+  "Roboto Mono":        { m: ["clean","minimal","modern"],    u: ["ui-app","body-text"] },
+};
+
+const FONT_DESC = {
+  "Roboto":             "Google's geometric sans — clean, versatile, and ubiquitous.",
+  "Open Sans":          "Humanist sans with a neutral personality built for readability.",
+  "Lato":               "Polish-designed sans that feels warm yet professional.",
+  "Montserrat":         "Urban geometric inspired by early 20th-century signage.",
+  "Raleway":            "Elegant, thin display face with a distinctive character.",
+  "Oswald":             "Condensed reworking of classic gothic for digital screens.",
+  "Merriweather":       "Designed for screen readability with strong, sturdy strokes.",
+  "Playfair Display":   "High-contrast editorial serif with timeless sophistication.",
+  "Cormorant Garamond": "Refined Renaissance-inspired serif with delicate strokes.",
+  "Lora":               "Contemporary serif with calligraphic roots — great for long reads.",
+  "EB Garamond":        "A revival of the iconic Garamond — scholarly and timeless.",
+  "Crimson Text":       "Book-quality serif inspired by old-style Dutch type.",
+  "Libre Baskerville":  "A web-optimised Baskerville — authoritative and legible.",
+  "PT Serif":           "Sturdy companion to PT Sans — solid and editorial.",
+  "DM Serif Display":   "Contemporary high-contrast serif with a modern editorial feel.",
+  "Fraunces":           "Wonky optical-size serif inspired by early advertising type.",
+  "Bitter":             "Solid slab serif with strong strokes for long-form reading.",
+  "Spectral":           "Versatile book serif with expressive optical sizes.",
+  "Alegreya":           "Literary serif with a dynamic, calligraphic quality.",
+  "Vollkorn":           "Sturdy book face balancing classical form with digital clarity.",
+  "Cardo":              "Classical scholar's serif with full Unicode support.",
+  "Noto Serif":         "Pan-language serif for universal typographic harmony.",
+  "Zilla Slab":         "Firefox's brand serif — bold, characterful, and approachable.",
+  "Inter":              "Precision-crafted UI typeface designed for screens at all sizes.",
+  "Poppins":            "Geometric sans with friendly rounded forms and Indian influence.",
+  "Nunito":             "Well-balanced rounded sans with soft, approachable letterforms.",
+  "Work Sans":          "Based on early grotesques, optimised for digital use.",
+  "DM Sans":            "Low-contrast geometric sans designed for small-to-medium text.",
+  "Plus Jakarta Sans":  "Contemporary sans with expressive letterforms.",
+  "Manrope":            "Modern geometric-grotesque with a touch of humanity.",
+  "Outfit":             "Clean geometric sans with excellent legibility at all sizes.",
+  "Josefin Sans":       "Art Deco-inspired geometric with striking uppercase characters.",
+  "Cabin":              "Humanist sans with a warm, approachable personality.",
+  "Karla":              "Grotesque sans that balances simplicity with character.",
+  "Jost":               "Clean geometric sans inspired by the work of Rudolf Koch.",
+  "Urbanist":           "Geometric low-contrast sans built for digital environments.",
+  "Rubik":              "Slightly rounded sans with a strong but playful character.",
+  "Mulish":             "Minimalist sans that balances simplicity with warmth.",
+  "Space Grotesk":      "Quirky geometric grotesk with a distinctive editorial edge.",
+  "Syne":               "Experimental grotesque that pushes letterform conventions.",
+  "Bebas Neue":         "Bold all-caps display face — impactful and endlessly versatile.",
+  "Anton":              "Condensed realist sans for powerful, direct messaging.",
+  "Abril Fatface":      "Ultra-bold titling face inspired by 19th-century poster types.",
+  "Righteous":          "Retro-flavoured display with an optimistic, fun character.",
+  "Lobster":            "Script-style display with a friendly hand-lettered feel.",
+  "Pacifico":           "Casual connected script with a retro, laid-back vibe.",
+  "Dancing Script":     "Lively casual script with a natural handwriting feel.",
+  "Sacramento":         "Elegant thin calligraphy script for refined contexts.",
+  "Caveat":             "Authentic handwriting face with an informal, personal touch.",
+  "Space Mono":         "Fixed-width face designed for code and editorial use.",
+  "Fira Code":          "Monospace with programming ligatures for technical contexts.",
+  "IBM Plex Mono":      "IBM's corporate monospace — technical yet characterful.",
+};
+
+const CAT_LABELS = {
+  'sans-serif':  'Sans Serif',
+  'serif':       'Serif',
+  'display':     'Display',
+  'handwriting': 'Handwriting',
+  'monospace':   'Monospace',
+};
+
+// ================================================================
+//  STATE
+// ================================================================
+
+let allFonts      = [];
+let loadedFonts   = new Set();
+
+const state = {
+  apiKey:       'AIzaSyBP_DTVtmG7nXULbP6k1j2FN4-sQdM8E6A',
+  search:       '',
+  categories:   new Set(),
+  moods:        new Set(),
+  useCases:     new Set(),
+  sort:         'popularity',
+  primaryFont:  null,
+  pairingFont:  null,
+};
+
+// ================================================================
+//  WELCOME / NAVIGATION
+// ================================================================
+
+function dismissWelcome() {
+  localStorage.setItem('tsb_welcomed', '1');
+  document.getElementById('welcome-overlay').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  if (!allFonts.length) bootstrap();
+}
+
+function goToWelcome() {
+  document.getElementById('welcome-overlay').style.display = 'flex';
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+// ================================================================
+//  BOOTSTRAP
+// ================================================================
+
+function bootstrap() {
+  updateStepProgress(1);
+  buildSidebar();
+  showSkeletons();
+  fetchFonts();
+}
+
+function buildSidebar() {
+  // Categories as pill toggles
+  document.getElementById('cat-list').innerHTML = Object.entries(CAT_LABELS)
+    .map(([val, lbl]) => `<span class="chip" data-k="${val}" onclick="toggleCatPill(this,'${val}')">${lbl}</span>`)
+    .join('');
+
+  // Mood chips
+  document.getElementById('mood-chips').innerHTML = Object.entries(MOOD_DEFS)
+    .map(([k, lbl]) => `<span class="chip" data-k="${k}" onclick="toggleChip(this,'mood','${k}')">${lbl}</span>`)
+    .join('');
+
+  // Use-case chips
+  document.getElementById('usecase-chips').innerHTML = Object.entries(USECASE_DEFS)
+    .map(([k, lbl]) => `<span class="chip" data-k="${k}" onclick="toggleChip(this,'usecase','${k}')">${lbl}</span>`)
+    .join('');
+}
+
+function toggleCatPill(el, cat) {
+  if (state.categories.has(cat)) {
+    state.categories.delete(cat);
+    el.classList.remove('active');
+  } else {
+    state.categories.add(cat);
+    el.classList.add('active');
+  }
+  applyFilters();
+}
+
+// ================================================================
+//  GOOGLE FONTS FETCH
+// ================================================================
+
+async function fetchFonts() {
+  const url = `https://www.googleapis.com/webfonts/v1/webfonts?key=${state.apiKey}&sort=popularity`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    const data = await res.json();
+
+    allFonts = data.items.map(f => ({
+      family:   f.family,
+      category: f.category,
+      variants: f.variants,
+      meta:     FONT_META[f.family] || { m: [], u: [] },
+    }));
+
+    updateCounts();
+    applyFilters();
+  } catch (err) {
+    renderError(err.message);
+  }
+}
+
+function updateCounts() {
+  const cnt = {};
+  allFonts.forEach(f => { cnt[f.category] = (cnt[f.category] || 0) + 1; });
+  Object.entries(cnt).forEach(([cat, n]) => {
+    const el = document.getElementById(`cnt-${cat}`);
+    if (el) el.textContent = n;
+  });
+}
+
+// ================================================================
+//  FILTER + SORT
+// ================================================================
+
+function applyFilters() {
+  const q  = state.search.toLowerCase();
+  const cats = state.categories;
+  const ms   = state.moods;
+  const us   = state.useCases;
+
+  let results = allFonts.filter(f => {
+    if (q && !f.family.toLowerCase().includes(q)) return false;
+    if (cats.size && !cats.has(f.category))       return false;
+    if (ms.size  && !f.meta.m.some(x => ms.has(x)))  return false;
+    if (us.size  && !f.meta.u.some(x => us.has(x)))  return false;
+    return true;
+  });
+
+  if (state.sort === 'alpha') {
+    results = [...results].sort((a, b) => a.family.localeCompare(b.family));
+  }
+
+  renderResults(results);
+}
+
+// ================================================================
+//  RENDER
+// ================================================================
+
+const DISPLAY_CAP = 60;
+
+function showSkeletons() {
+  document.getElementById('font-grid').innerHTML = Array.from({ length: 9 }, () => `
+    <div class="skel">
+      <div class="skel-line" style="height:36px;width:65%"></div>
+      <div class="skel-line" style="height:13px;width:90%"></div>
+      <div class="skel-line" style="height:13px;width:75%"></div>
+      <div style="display:flex;gap:5px;margin-top:2px">
+        <div class="skel-line" style="height:18px;width:52px;border-radius:100px"></div>
+        <div class="skel-line" style="height:18px;width:64px;border-radius:100px"></div>
+        <div class="skel-line" style="height:18px;width:44px;border-radius:100px"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderResults(fonts) {
+  const total  = fonts.length;
+  const shown  = fonts.slice(0, DISPLAY_CAP);
+  const countEl = document.getElementById('results-count');
+
+  if (total === 0) {
+    countEl.textContent = 'No fonts found';
+    document.getElementById('font-grid').innerHTML = `
+      <div class="empty-state">
+        <h3>No fonts match your filters</h3>
+        <p>Try removing a filter or broadening your search.</p>
+      </div>`;
+    return;
+  }
+
+  countEl.textContent = total > DISPLAY_CAP
+    ? `Showing ${DISPLAY_CAP} of ${total} fonts`
+    : `${total} font${total === 1 ? '' : 's'}`;
+
+  document.getElementById('font-grid').innerHTML = shown.map(cardHTML).join('');
+
+  requestAnimationFrame(() => loadFontCSS(shown.map(f => f.family)));
+}
+
+function renderError(msg) {
+  document.getElementById('results-count').textContent = 'Error';
+  document.getElementById('font-grid').innerHTML = `
+    <div class="error-state">
+      <p>Could not load fonts: ${escHtml(msg)}<br>Check your API key and try again.</p>
+    </div>`;
+}
+
+// ── Card HTML ─────────────────────────────────────────────────
+
+function cardHTML(font) {
+  const safe  = escHtml(font.family);
+  const safej = font.family.replace(/'/g, "\\'");
+
+  const catLabel = CAT_LABELS[font.category] || font.category;
+  const desc     = FONT_DESC[font.family] || `A versatile ${catLabel.toLowerCase()} typeface.`;
+
+  // Parse numeric weights from variants (skip italic entries)
+  const weights = font.variants
+    .map(v => v === 'regular' ? '400' : v === 'italic' ? null : v.replace('italic',''))
+    .filter(v => v && /^\d+$/.test(v))
+    .filter((v, i, arr) => arr.indexOf(v) === i)
+    .sort((a, b) => +a - +b);
+
+  const weightTags = weights.map(w => `<span class="card-weight">${w}</span>`).join('');
+
+  return `
+    <div class="font-card" data-family="${safe}" onclick="selectFont('${safej}')">
+      <span class="card-cat">${catLabel.toUpperCase()}</span>
+      <div class="card-name-display" style="font-family:'${safe}',serif;">${safe}</div>
+      <div class="card-abc" style="font-family:'${safe}',serif;">Aa Bb Cc 123</div>
+      <div class="card-desc">${escHtml(desc)}</div>
+      <div class="card-weights">${weightTags}</div>
+    </div>`;
+}
+
+// ── Font CSS lazy-loading ─────────────────────────────────────
+
+function loadFontCSS(families) {
+  const toLoad = families.filter(f => !loadedFonts.has(f));
+  if (!toLoad.length) return;
+
+  const BATCH = 15;
+  for (let i = 0; i < toLoad.length; i += BATCH) {
+    const batch  = toLoad.slice(i, i + BATCH);
+    const params = batch.map(f => `family=${encodeURIComponent(f)}:wght@400;700`).join('&');
+    const link   = document.createElement('link');
+    link.rel  = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?${params}&display=swap`;
+    document.head.appendChild(link);
+    batch.forEach(f => loadedFonts.add(f));
+  }
+}
+
+// ================================================================
+//  EVENT HANDLERS
+// ================================================================
+
+function handleSearch() {
+  state.search = document.getElementById('search-input').value;
+  applyFilters();
+}
+
+function toggleCat(cb) {
+  cb.checked ? state.categories.add(cb.value) : state.categories.delete(cb.value);
+  applyFilters();
+}
+
+function toggleChip(el, type, key) {
+  const set = type === 'mood' ? state.moods : state.useCases;
+  if (set.has(key)) { set.delete(key); el.classList.remove('active'); }
+  else              { set.add(key);    el.classList.add('active'); }
+  applyFilters();
+}
+
+function clearFilters() {
+  state.search = '';
+  state.categories.clear();
+  state.moods.clear();
+  state.useCases.clear();
+
+  document.getElementById('search-input').value = '';
+  document.querySelectorAll('.chip.active').forEach(c => c.classList.remove('active'));
+
+  applyFilters();
+}
+
+document.getElementById('sort-select').addEventListener('change', function () {
+  state.sort = this.value;
+  applyFilters();
+});
+
+// ================================================================
+//  PAIRING DATA
+// ================================================================
+
+const PAIRING_MAP = {
+  // Serif primaries → clean sans pairings
+  "Playfair Display":   ["Lato", "Source Sans 3", "Raleway"],
+  "Cormorant Garamond": ["Raleway", "Josefin Sans", "Montserrat"],
+  "EB Garamond":        ["Source Sans 3", "Nunito", "Lato"],
+  "Merriweather":       ["Open Sans", "Lato", "Nunito"],
+  "Lora":               ["Montserrat", "Raleway", "Work Sans"],
+  "Crimson Text":       ["Raleway", "Work Sans", "Nunito"],
+  "Libre Baskerville":  ["Lato", "Source Sans 3", "Nunito"],
+  "PT Serif":           ["Open Sans", "Lato", "Source Sans 3"],
+  "DM Serif Display":   ["DM Sans", "Inter", "Lato"],
+  "Fraunces":           ["DM Sans", "Inter", "Outfit"],
+  "Bitter":             ["Raleway", "Nunito", "Work Sans"],
+  "Spectral":           ["Inter", "Raleway", "Work Sans"],
+  "Alegreya":           ["Lato", "Source Sans 3", "Work Sans"],
+  "Vollkorn":           ["Work Sans", "Raleway", "Inter"],
+  "Cardo":              ["Raleway", "Lato", "Nunito"],
+  "Noto Serif":         ["Noto Sans", "Lato", "Open Sans"],
+  "Zilla Slab":         ["Raleway", "Nunito", "Work Sans"],
+  // Sans-serif primaries → serif pairings
+  "Roboto":             ["Playfair Display", "Merriweather", "Lora"],
+  "Open Sans":          ["Playfair Display", "Merriweather", "PT Serif"],
+  "Lato":               ["Playfair Display", "Merriweather", "Lora"],
+  "Montserrat":         ["Merriweather", "Lora", "Crimson Text"],
+  "Raleway":            ["Lora", "Merriweather", "Crimson Text"],
+  "Poppins":            ["Merriweather", "Lora", "EB Garamond"],
+  "Nunito":             ["Merriweather", "Lora", "EB Garamond"],
+  "Inter":              ["Playfair Display", "Fraunces", "Merriweather"],
+  "Work Sans":          ["Merriweather", "Lora", "Bitter"],
+  "DM Sans":            ["DM Serif Display", "Fraunces", "Lora"],
+  "Plus Jakarta Sans":  ["Lora", "Fraunces", "Merriweather"],
+  "Manrope":            ["Lora", "Merriweather", "EB Garamond"],
+  "Outfit":             ["Fraunces", "Merriweather", "Lora"],
+  "Josefin Sans":       ["Lora", "EB Garamond", "Crimson Text"],
+  "Cabin":              ["Merriweather", "Lora", "PT Serif"],
+  "Karla":              ["Lora", "Merriweather", "Bitter"],
+  "Jost":               ["Lora", "Fraunces", "EB Garamond"],
+  "Urbanist":           ["Fraunces", "Lora", "Cormorant Garamond"],
+  "Rubik":              ["Merriweather", "Lora", "PT Serif"],
+  "Mulish":             ["Merriweather", "Lora", "EB Garamond"],
+  "Source Sans 3":      ["Playfair Display", "Merriweather", "Lora"],
+  "Quicksand":          ["Merriweather", "Lora", "PT Serif"],
+  "Space Grotesk":      ["Fraunces", "Cormorant Garamond", "EB Garamond"],
+  "Syne":               ["EB Garamond", "Lora", "Fraunces"],
+  "Barlow":             ["Merriweather", "Lora", "PT Serif"],
+  "Barlow Condensed":   ["Lora", "Merriweather", "PT Serif"],
+  "Exo 2":              ["Lora", "Fraunces", "Merriweather"],
+  "Noto Sans":          ["Noto Serif", "Merriweather", "Lora"],
+  // Display → clean sans for body
+  "Abril Fatface":      ["Lato", "Source Sans 3", "Open Sans"],
+  "Bebas Neue":         ["Lato", "Open Sans", "Merriweather"],
+  "Oswald":             ["Lato", "Open Sans", "Merriweather"],
+  "Anton":              ["Lato", "Open Sans", "Nunito"],
+  "Alfa Slab One":      ["Lato", "Open Sans", "Source Sans 3"],
+  "Righteous":          ["Lato", "Nunito", "Open Sans"],
+  "Fredoka One":        ["Quicksand", "Nunito", "Lato"],
+  "Titan One":          ["Lato", "Open Sans", "Nunito"],
+  "Baloo 2":            ["Lato", "Open Sans", "Nunito"],
+  "Lobster":            ["Lato", "Raleway", "Open Sans"],
+  // Handwriting → clean sans for body
+  "Dancing Script":     ["Lato", "Raleway", "Montserrat"],
+  "Pacifico":           ["Lato", "Open Sans", "Nunito"],
+  "Sacramento":         ["Lato", "Raleway", "Montserrat"],
+  "Permanent Marker":   ["Lato", "Open Sans", "Source Sans 3"],
+  "Caveat":             ["Lato", "Raleway", "Nunito"],
+  "Indie Flower":       ["Lato", "Open Sans", "Nunito"],
+  "Kalam":              ["Lato", "Raleway", "Nunito"],
+  "Varela Round":       ["Lato", "Open Sans", "Nunito"],
+  // Monospace → serif or neutral pairings
+  "Space Mono":         ["Playfair Display", "Lora", "Fraunces"],
+  "Fira Code":          ["Inter", "Work Sans", "Lato"],
+  "IBM Plex Mono":      ["Inter", "Lato", "Work Sans"],
+  "Source Code Pro":    ["Source Sans 3", "Lato", "Inter"],
+  "Roboto Mono":        ["Roboto", "Lato", "Open Sans"],
+};
+
+// ── Tag-aware pairing scorer ──────────────────────────────────
+
+// Returns mood + use-case tags for a font, falling back to category defaults
+function getMetaFor(font) {
+  if (FONT_META[font.family]) return FONT_META[font.family];
+  return CATEGORY_DEFAULT_TAGS[font.category] || { m: [], u: [] };
+}
+
+// Score a candidate font as a pairing for the primary
+function scorePairing(primary, candidate, candidateRank) {
+  if (candidate.family === primary.family) return -Infinity;
+
+  const pm = getMetaFor(primary);
+  const cm = getMetaFor(candidate);
+
+  let score = 0;
+
+  // 1. Category contrast — classic serif/sans pairing rule
+  const complements = COMPLEMENTARY_CATEGORIES[primary.category] || [];
+  if (complements.includes(candidate.category)) score += 5;
+
+  // 2. Mood overlap — shared moods create visual harmony
+  const sharedMoods = pm.m.filter(m => cm.m.includes(m));
+  score += sharedMoods.length;
+
+  // 3. Use-case complement — primary display/branding pairs with body-text candidates (and vice versa)
+  const primaryIsDisplay = pm.u.includes('display') || pm.u.includes('branding');
+  const primaryIsBody    = pm.u.includes('body-text');
+  const candIsDisplay    = cm.u.includes('display') || cm.u.includes('branding');
+  const candIsBody       = cm.u.includes('body-text');
+  if (primaryIsDisplay && candIsBody)    score += 2;
+  if (primaryIsBody    && candIsDisplay) score += 2;
+
+  // 4. Curated bonus — preserve hand-picked PAIRING_MAP wisdom
+  const curated = PAIRING_MAP[primary.family] || [];
+  if (curated.includes(candidate.family)) score += 6;
+
+  // 5. Popularity tiebreak — tiny inverse-rank bias so ties go to popular fonts
+  score += Math.max(0, (200 - candidateRank) / 1000);
+
+  return score;
+}
+
+// Returns the 3 best pairing font families for a primary font.
+// Guarantees at least 2 distinct categories among the picks.
+function getPairings(primary) {
+  if (!allFonts || !allFonts.length) {
+    // API hasn't loaded yet — fall back to curated only
+    return PAIRING_MAP[primary.family] || ["Lato", "Open Sans", "Merriweather"];
+  }
+
+  // Score all candidates
+  const ranked = allFonts
+    .map((c, i) => ({ font: c, score: scorePairing(primary, c, i) }))
+    .filter(r => r.score > -Infinity)
+    .sort((a, b) => b.score - a.score);
+
+  // Take top 3, then enforce category variety
+  let picks = ranked.slice(0, 3);
+  const distinctCats = new Set(picks.map(p => p.font.category));
+
+  if (distinctCats.size < 2) {
+    // All 3 picks share one category — swap the lowest for the best font of a different category
+    const dominantCat = picks[0].font.category;
+    const replacement = ranked.find(r =>
+      r.font.category !== dominantCat &&
+      !picks.includes(r)
+    );
+    if (replacement) picks[2] = replacement;
+  }
+
+  return picks.map(p => p.font.family);
+}
+
+// Looks up pairings by family name alone (used in step 4 where we only have strings)
+function getPairingsByFamily(family) {
+  const font = allFonts.find(f => f.family === family);
+  if (font) return getPairings(font);
+  // Fallback when font isn't in allFonts (shouldn't happen but safe)
+  return PAIRING_MAP[family] || ["Lato", "Open Sans", "Merriweather"];
+}
+
+// ================================================================
+//  STEP DATA
+// ================================================================
+
+const STEP_INFO = [
+  {
+    label:    'Filter Fonts',
+    heading:  'Narrow your options.',
+    subtitle: 'Use the filters below to match fonts to your project\'s personality and needs. You can skip this step and browse all fonts.',
+  },
+  {
+    label:    'Pick Primary',
+    heading:  'Choose your primary font.',
+    subtitle: 'Select the main font that will define the personality and tone of your type system. Click any card to select it.',
+  },
+  {
+    label:    'Choose Pairing',
+    heading:  'Find the perfect pairing.',
+    subtitle: 'Choose a complementary font that works alongside your primary. Each preview shows how the two look together.',
+  },
+  {
+    label:    'Preview',
+    heading:  'See them together.',
+    subtitle: 'Preview your pairing with real sample text. Click any text to customise it.',
+  },
+  {
+    label:    'Export',
+    heading:  'Your complete type system.',
+    subtitle: 'Here is your final type pairing and scale. Use this as a reference for your project.',
+  },
+];
+
+// ================================================================
+//  STEP NAVIGATION
+// ================================================================
+
+let currentStep = 1;
+
+function goToStep(n) {
+  document.getElementById(`panel-${currentStep}`).classList.remove('active');
+  currentStep = n;
+  document.getElementById(`panel-${n}`).classList.add('active');
+  updateStepProgress(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateHeaderSteps(n) {
+  const total = STEP_INFO.length;
+  document.getElementById('header-steps').innerHTML = STEP_INFO.map((s, i) => {
+    const idx       = i + 1;
+    const stepState = idx < n ? 'done' : idx === n ? 'active' : 'future';
+    const num       = stepState === 'done' ? '✓' : idx;
+    const clickable = stepState === 'done';
+    const sep       = i < total - 1 ? '<div class="step-sep"></div>' : '';
+    return `<div class="step-item ${stepState}" ${clickable ? `onclick="clickStep(${idx})" role="button" tabindex="0"` : ''}>
+      <div class="step-num">${num}</div>
+      <span class="step-lbl">${s.label}</span>
+    </div>${sep}`;
+  }).join('');
+}
+
+function clickStep(n) {
+  // Only navigate if we have the data needed for that step
+  if (n === 1) { goToStep(1); }
+  else if (n === 3 && state.primaryFont) { goToStep(3); }
+  else if (n === 4 && state.pairingFont) { goToStep(4); }
+}
+
+function goBack() {
+  const prev = currentStep === 5 ? 4 : currentStep === 4 ? 3 : 1;
+  goToStep(prev);
+}
+
+function updateStepProgress(n) {
+  const info = STEP_INFO[n - 1];
+  document.getElementById('sp-inner').innerHTML = `
+    <div class="sp-counter">Step ${n} of ${STEP_INFO.length}</div>
+    <h1 class="sp-heading">${info.heading}</h1>
+    <p class="sp-subtitle">${info.subtitle}</p>
+  `;
+  updateHeaderSteps(n);
+}
+
+// ================================================================
+//  SELECT FONT → show bottom bar
+// ================================================================
+
+// ── Shared bar helpers ────────────────────────────────────────
+
+function showBar(family, ctaLabel, ctaAction) {
+  const nameEl = document.getElementById('sel-bar-name');
+  nameEl.textContent = family;
+  nameEl.style.fontFamily = `'${family}', serif`;
+  const cta = document.getElementById('sel-bar-cta');
+  cta.textContent = ctaLabel;
+  cta.onclick = ctaAction;
+  document.getElementById('selection-bar').classList.add('visible');
+}
+
+function hideBar() {
+  document.getElementById('selection-bar').classList.remove('visible');
+}
+
+// ── Step 1 selection ──────────────────────────────────────────
+
+function selectFont(family) {
+  if (state.primaryFont && state.primaryFont.family === family) {
+    clearSelection();
+    return;
+  }
+  const font = allFonts.find(f => f.family === family);
+  if (!font) return;
+  state.primaryFont = font;
+
+  document.querySelectorAll('#panel-1 .font-card.selected').forEach(c => c.classList.remove('selected'));
+  const card = document.querySelector(`#panel-1 .font-card[data-family="${CSS.escape(family)}"]`);
+  if (card) card.classList.add('selected');
+
+  showBar(family, 'Find pairings →', findPairings);
+}
+
+function clearSelection() {
+  state.primaryFont = null;
+  document.querySelectorAll('.font-card.selected').forEach(c => c.classList.remove('selected'));
+  hideBar();
+}
+
+function findPairings() {
+  if (!state.primaryFont) return;
+  hideBar();
+  renderPairings(state.primaryFont);
+  goToStep(3);
+}
+
+// ── Step 3 pairing selection ──────────────────────────────────
+
+function selectPairingCard(family) {
+  const continueBtn = document.getElementById('step3-continue');
+
+  if (state.pairingFont && state.pairingFont.family === family) {
+    state.pairingFont = null;
+    document.querySelectorAll('#step3-content .font-card.selected').forEach(c => c.classList.remove('selected'));
+    if (continueBtn) continueBtn.disabled = true;
+    return;
+  }
+  const font = allFonts.find(f => f.family === family) || { family };
+  state.pairingFont = font;
+
+  document.querySelectorAll('#step3-content .font-card.selected').forEach(c => c.classList.remove('selected'));
+  const card = document.querySelector(`#step3-content .font-card[data-family="${CSS.escape(family)}"]`);
+  if (card) card.classList.add('selected');
+
+  if (continueBtn) continueBtn.disabled = false;
+}
+
+function confirmPairing() {
+  if (!state.pairingFont) return;
+  renderTypeSystem(state.primaryFont, state.pairingFont);
+  goToStep(4);
+}
+
+// ================================================================
+//  STEP 3 — choose pairing
+// ================================================================
+
+function renderPairings(font) {
+  const pairings = getPairings(font);
+  const safe     = escHtml(font.family);
+  const desc     = FONT_DESC[font.family] || '';
+
+  loadFontCSS([font.family, ...pairings]);
+
+  const cards = pairings.map(p => pairingCardHTML(p)).join('');
+
+  document.getElementById('step3-content').innerHTML = `
+    <div class="primary-highlight">
+      <div class="primary-role">Your Primary Font</div>
+      <div class="primary-font-name" style="font-family:'${safe}',serif;">${safe}</div>
+      ${desc ? `<div class="primary-font-desc">${escHtml(desc)}</div>` : ''}
+    </div>
+
+    <p class="pairing-intro-text">
+      These pairings complement ${safe} — they contrast enough to create hierarchy
+      while sharing a compatible visual rhythm.
+    </p>
+
+    <div class="pairing-cards-grid">${cards}</div>
+
+    <div class="step3-actions" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:32px;">
+      <button class="btn-secondary" onclick="goBack()">← Back to results</button>
+      <button class="btn-primary" id="step3-continue" onclick="confirmPairing()" disabled>Continue to preview →</button>
+    </div>
+  `;
+}
+
+function pairingCardHTML(family) {
+  const font    = allFonts.find(f => f.family === family);
+  const safe    = escHtml(family);
+  const safej   = family.replace(/'/g, "\\'");
+  const cat     = font ? (CAT_LABELS[font.category] || font.category) : '';
+  const desc    = FONT_DESC[family] || (cat ? `A versatile ${cat.toLowerCase()} typeface.` : '');
+
+  const weights = font ? font.variants
+    .map(v => v === 'regular' ? '400' : v === 'italic' ? null : v.replace('italic',''))
+    .filter(v => v && /^\d+$/.test(v))
+    .filter((v, i, arr) => arr.indexOf(v) === i)
+    .sort((a, b) => +a - +b) : [];
+
+  const weightTags = weights.map(w => `<span class="card-weight">${w}</span>`).join('');
+
+  return `
+    <div class="font-card" data-family="${safe}" onclick="selectPairingCard('${safej}')">
+      <span class="card-cat">${cat.toUpperCase()}</span>
+      <div class="card-name-display" style="font-family:'${safe}',serif;">${safe}</div>
+      <div class="card-abc" style="font-family:'${safe}',serif;">Aa Bb Cc 123</div>
+      <div class="card-desc">${escHtml(desc)}</div>
+      <div class="card-weights">${weightTags}</div>
+    </div>`;
+}
+
+// ================================================================
+//  STEP 4 — type system preview
+// ================================================================
+
+function renderTypeSystem(primary, pairing) {
+  const sp = escHtml(primary.family);
+  const ss = escHtml(pairing.family);
+
+  loadFontCSS([primary.family, pairing.family]);
+
+  // Primary dropdown: all Google Fonts sorted A–Z (curated pairings for ~65, category fallback for the rest)
+  const primaryOpts = allFonts
+    .slice()
+    .sort((a, b) => a.family.localeCompare(b.family))
+    .map(f => `<option value="${escHtml(f.family)}" ${f.family === primary.family ? 'selected' : ''}>${escHtml(f.family)}</option>`)
+    .join('');
+
+  // Pairing dropdown: suggested pairings for the primary, with current selection pre-selected
+  const pairingCandidates = getPairingsByFamily(primary.family);
+  const pairingOpts = pairingCandidates
+    .map(f => `<option value="${escHtml(f)}" ${f === pairing.family ? 'selected' : ''}>${escHtml(f)}</option>`)
+    .join('');
+
+  document.getElementById('step4-content').innerHTML = `
+    <div class="step4-layout">
+      <aside class="step4-sidebar">
+        <div class="step4-controls">
+          <div class="ctrl-group">
+            <span class="ctrl-label">Theme</span>
+            <div class="theme-btns">
+              <button class="theme-btn active" onclick="setPreviewTheme(this,'light')">Light</button>
+              <button class="theme-btn"        onclick="setPreviewTheme(this,'dark')">Dark</button>
+            </div>
+          </div>
+          <div class="ctrl-group">
+            <span class="ctrl-label">Primary</span>
+            <select class="font-select-pill" id="sel-primary" onchange="swapPrimaryFont()">
+              ${primaryOpts}
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <span class="ctrl-label">Pairing</span>
+            <select class="font-select-pill" id="sel-pairing" onchange="swapPairingFont()">
+              ${pairingOpts}
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <div class="size-wrap">
+              <span class="size-label" id="size-label">Base: 16px</span>
+              <input type="range" class="size-slider" id="size-slider"
+                     min="12" max="24" value="16" oninput="updateBaseSize(this.value)">
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="preview-card" id="preview-card" data-theme="light">
+      <div class="preview-section">
+        <div class="preview-meta-row">
+          <span class="preview-meta-lbl" id="lbl-display">BRAND NAME — DISPLAY · ${sp.toUpperCase()}</span>
+          <span class="preview-meta-lbl" id="sz-display">56PX</span>
+        </div>
+        <div class="preview-editable prev-display" id="prev-display"
+             style="font-family:'${sp}',serif;"
+             contenteditable="true"
+             >Meridian Studio</div>
+      </div>
+      <div class="preview-section">
+        <div class="preview-meta-row">
+          <span class="preview-meta-lbl" id="lbl-heading">TAGLINE — HEADING · ${sp.toUpperCase()}</span>
+          <span class="preview-meta-lbl" id="sz-heading">32PX</span>
+        </div>
+        <div class="preview-editable prev-heading" id="prev-heading"
+             style="font-family:'${sp}',serif;"
+             contenteditable="true"
+             >Crafting brands that stand the test of time.</div>
+      </div>
+      <div class="preview-section">
+        <div class="preview-meta-row">
+          <span class="preview-meta-lbl" id="lbl-body">PARAGRAPH — BODY · ${ss.toUpperCase()}</span>
+          <span class="preview-meta-lbl" id="sz-body">16PX</span>
+        </div>
+        <div class="preview-editable prev-body" id="prev-body"
+             style="font-family:'${ss}',sans-serif;"
+             contenteditable="true">Great typography doesn't shout — it leads the eye, sets the mood, and earns trust quietly. The right typeface combination creates a visual language that feels inevitable, as if no other choice was ever possible.</div>
+      </div>
+      <div class="preview-section">
+        <div class="preview-meta-row">
+          <span class="preview-meta-lbl" id="lbl-caption">CAPTION · ${ss.toUpperCase()}</span>
+          <span class="preview-meta-lbl" id="sz-caption">12PX</span>
+        </div>
+        <div class="preview-editable prev-caption" id="prev-caption"
+             style="font-family:'${ss}',sans-serif;"
+             contenteditable="true">Image: A well-chosen typeface does more than communicate — it sets the entire emotional register of a design.</div>
+      </div>
+      </div><!-- /preview-card -->
+    </div><!-- /step4-layout -->
+
+    <div class="step3-actions" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:32px;">
+      <button class="btn-secondary" onclick="goBack()">← Back to pairings</button>
+      <button class="btn-primary" onclick="advanceToStep5()">Continue to export →</button>
+    </div>
+  `;
+}
+
+// ── Step 4 helper functions ───────────────────────────────────
+
+function setPreviewTheme(btn, theme) {
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('preview-card').dataset.theme = theme;
+}
+
+
+
+function updateBaseSize(val) {
+  const base    = +val;
+  const display = Math.round(base * 3.5);
+  const heading = Math.round(base * 2);
+  const caption = Math.max(10, Math.round(base * 0.75));
+  document.getElementById('size-label').textContent      = `Base: ${base}px`;
+  document.getElementById('sz-display').textContent      = `${display}PX`;
+  document.getElementById('sz-heading').textContent      = `${heading}PX`;
+  document.getElementById('sz-body').textContent         = `${base}PX`;
+  document.getElementById('sz-caption').textContent      = `${caption}PX`;
+  document.getElementById('prev-display').style.fontSize = `${display}px`;
+  document.getElementById('prev-heading').style.fontSize = `${heading}px`;
+  document.getElementById('prev-body').style.fontSize    = `${base}px`;
+  document.getElementById('prev-caption').style.fontSize = `${caption}px`;
+}
+
+function swapPrimaryFont() {
+  const primary = document.getElementById('sel-primary').value;
+
+  // Rebuild pairing dropdown with new primary's suggested pairings
+  const newPairings = getPairingsByFamily(primary);
+  const pairingSel  = document.getElementById('sel-pairing');
+  pairingSel.innerHTML = newPairings
+    .map(f => `<option value="${escHtml(f)}">${escHtml(f)}</option>`)
+    .join('');
+
+  const pairing = pairingSel.value;
+  loadFontCSS([primary, pairing]);
+
+  document.getElementById('prev-display').style.fontFamily  = `'${primary}', serif`;
+  document.getElementById('prev-heading').style.fontFamily  = `'${primary}', serif`;
+  document.getElementById('prev-body').style.fontFamily     = `'${pairing}', sans-serif`;
+  document.getElementById('prev-caption').style.fontFamily  = `'${pairing}', sans-serif`;
+
+  document.getElementById('lbl-display').textContent = `BRAND NAME — DISPLAY · ${primary.toUpperCase()}`;
+  document.getElementById('lbl-heading').textContent = `TAGLINE — HEADING · ${primary.toUpperCase()}`;
+  document.getElementById('lbl-body').textContent    = `PARAGRAPH — BODY · ${pairing.toUpperCase()}`;
+  document.getElementById('lbl-caption').textContent = `CAPTION · ${pairing.toUpperCase()}`;
+}
+
+function swapPairingFont() {
+  const primary = document.getElementById('sel-primary').value;
+  const pairing = document.getElementById('sel-pairing').value;
+  loadFontCSS([primary, pairing]);
+  document.getElementById('prev-body').style.fontFamily    = `'${pairing}', sans-serif`;
+  document.getElementById('prev-caption').style.fontFamily = `'${pairing}', sans-serif`;
+  document.getElementById('lbl-body').textContent    = `PARAGRAPH — BODY · ${pairing.toUpperCase()}`;
+  document.getElementById('lbl-caption').textContent = `CAPTION · ${pairing.toUpperCase()}`;
+}
+
+function advanceToStep5() {
+  renderStep5(state.primaryFont, state.pairingFont);
+  goToStep(5);
+}
+
+// ================================================================
+//  STEP 5 — type system summary + scale chart
+// ================================================================
+
+function renderStep5(primary, pairing) {
+  const sp     = escHtml(primary.family);
+  const ss     = escHtml(pairing.family);
+  const spCat  = CAT_LABELS[primary.category] || primary.category || '';
+  const ssCat  = CAT_LABELS[pairing.category] || pairing.category || '';
+  const spDesc = FONT_DESC[primary.family] || '';
+  const ssDesc = FONT_DESC[pairing.family] || '';
+
+  loadFontCSS([primary.family, pairing.family]);
+
+  const SCALE = [
+    { role: 'Display',    size: 56, weight: 700, font: primary,  sample: sp,                                                              useCase: 'Hero titles, brand statements' },
+    { role: 'Heading 1',  size: 40, weight: 700, font: primary,  sample: 'The Art of Typography',                                         useCase: 'Page headings, article titles' },
+    { role: 'Heading 2',  size: 32, weight: 600, font: primary,  sample: 'Building visual hierarchy',                                     useCase: 'Section headings' },
+    { role: 'Heading 3',  size: 24, weight: 600, font: primary,  sample: 'A well-chosen typeface matters',                                useCase: 'Card titles, feature headings' },
+    { role: 'Body Large', size: 18, weight: 400, font: pairing,  sample: 'Typography is the art of arranging type.',                      useCase: 'Lead paragraphs, introductions' },
+    { role: 'Body',       size: 16, weight: 400, font: pairing,  sample: 'The right typeface creates a visual language that feels inevitable.', useCase: 'Main body copy' },
+    { role: 'Body Small', size: 14, weight: 400, font: pairing,  sample: 'Good typography goes largely unnoticed — it simply works.',     useCase: 'Secondary copy, supporting text' },
+    { role: 'Caption',    size: 12, weight: 400, font: pairing,  sample: 'Fig. 1 — A typeface is a design for a set of characters.',      useCase: 'Image captions, footnotes' },
+    { role: 'Label',      size: 11, weight: 600, font: pairing,  sample: 'CATEGORY · LABEL · TAG',                                        useCase: 'UI labels, tags, badges' },
+  ];
+
+  const weightLabel = w => w === 700 ? 'Bold' : w === 600 ? 'Semibold' : 'Regular';
+
+  const header = `
+    <div class="scale-header">
+      <div class="scale-th">Preview</div>
+      <div class="scale-th">Name</div>
+      <div class="scale-th">Size</div>
+      <div class="scale-th">Weight</div>
+      <div class="scale-th">Typeface</div>
+      <div class="scale-th">Use Case</div>
+    </div>`;
+
+  const rows = SCALE.map(s => {
+    const fam = escHtml(s.font.family);
+    return `
+      <div class="scale-row">
+        <div class="scale-preview-col">
+          <span class="scale-preview-text"
+                style="font-family:'${fam}',serif;font-size:${s.size}px;font-weight:${s.weight};line-height:1.2;">
+            ${s.sample}
+          </span>
+        </div>
+        <div class="scale-data-col">${s.role}</div>
+        <div class="scale-data-col">${s.size}px</div>
+        <div class="scale-data-col">${weightLabel(s.weight)}</div>
+        <div class="scale-data-col" style="font-family:'${fam}',serif;font-size:12px;">${fam}</div>
+        <div class="scale-data-col" style="color:var(--text-muted);font-size:12px;">${s.useCase}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('step5-content').innerHTML = `
+    <div id="export-target">
+      <div class="scale-section-label">Your type pairing</div>
+      <div class="ts-pair-summary">
+        <div class="ts-font-card">
+          <div class="ts-font-role">Primary font</div>
+          <div class="ts-font-name" style="font-family:'${sp}',serif;">${sp}</div>
+          <div class="ts-font-abc" style="font-family:'${sp}',serif;">Aa Bb Cc 123</div>
+          <div class="ts-font-meta">${spCat}${spDesc ? ' — ' + escHtml(spDesc) : ''}</div>
+        </div>
+        <div class="ts-font-card">
+          <div class="ts-font-role">Pairing font</div>
+          <div class="ts-font-name" style="font-family:'${ss}',sans-serif;">${ss}</div>
+          <div class="ts-font-abc" style="font-family:'${ss}',sans-serif;">Aa Bb Cc 123</div>
+          <div class="ts-font-meta">${ssCat}${ssDesc ? ' — ' + escHtml(ssDesc) : ''}</div>
+        </div>
+      </div>
+
+      <div class="scale-section-label">Type scale</div>
+      <div class="scale-chart">${header}${rows}</div>
+    </div>
+
+    <div class="step3-actions" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:32px;">
+      <button class="btn-secondary" onclick="goBack()">← Back to preview</button>
+      <div class="export-actions">
+        <button class="btn-secondary" onclick="exportPNG()">Export as PNG</button>
+        <button class="btn-primary" onclick="exportCSS()">Export as CSS</button>
+      </div>
+    </div>
+  `;
+}
+
+// ================================================================
+//  EXPORT — PNG + CSS
+// ================================================================
+
+function exportPNG() {
+  const target = document.getElementById('export-target');
+  if (!target || typeof html2canvas === 'undefined') {
+    alert('PNG export library not loaded. Please refresh and try again.');
+    return;
+  }
+
+  const btn = event.currentTarget;
+  const original = btn.textContent;
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+
+  // Offscreen wrapper with breathing room around the content
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = `
+    position: fixed;
+    top: -10000px;
+    left: 0;
+    background: #f5f3ef;
+    padding: 72px 80px;
+    width: ${target.offsetWidth + 160}px;
+    box-sizing: content-box;
+  `;
+  const clone = target.cloneNode(true);
+  clone.style.width = target.offsetWidth + 'px';
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+
+  html2canvas(wrapper, {
+    backgroundColor: '#f5f3ef',
+    scale: 2,
+    useCORS: true,
+    logging: false,
+  }).then(canvas => {
+    const link = document.createElement('a');
+    const primary = state.primaryFont.family.replace(/\s+/g, '-').toLowerCase();
+    const pairing = state.pairingFont.family.replace(/\s+/g, '-').toLowerCase();
+    link.download = `type-system-${primary}-${pairing}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    document.body.removeChild(wrapper);
+    btn.textContent = original;
+    btn.disabled = false;
+  }).catch(err => {
+    console.error(err);
+    alert('Could not export PNG: ' + err.message);
+    document.body.removeChild(wrapper);
+    btn.textContent = original;
+    btn.disabled = false;
+  });
+}
+
+function buildCSS() {
+  const p = state.primaryFont.family;
+  const s = state.pairingFont.family;
+  const primaryFb = state.primaryFont.category === 'serif' ? 'serif' :
+                    state.primaryFont.category === 'monospace' ? 'monospace' : 'sans-serif';
+  const pairingFb = state.pairingFont.category === 'serif' ? 'serif' :
+                    state.pairingFont.category === 'monospace' ? 'monospace' : 'sans-serif';
+
+  const importP = p.replace(/\s+/g, '+');
+  const importS = s.replace(/\s+/g, '+');
+
+  return `/* Type System — ${p} + ${s} */
+
+@import url('https://fonts.googleapis.com/css2?family=${importP}:wght@400;600;700&family=${importS}:wght@400;600;700&display=swap');
+
+:root {
+  /* Font families */
+  --font-primary: '${p}', ${primaryFb};
+  --font-pairing: '${s}', ${pairingFb};
+
+  /* Font sizes */
+  --text-display:    3.5rem;   /* 56px */
+  --text-heading-1:  2.5rem;   /* 40px */
+  --text-heading-2:  2rem;     /* 32px */
+  --text-heading-3:  1.5rem;   /* 24px */
+  --text-body-lg:    1.125rem; /* 18px */
+  --text-body:       1rem;     /* 16px */
+  --text-body-sm:    0.875rem; /* 14px */
+  --text-caption:    0.75rem;  /* 12px */
+  --text-label:      0.6875rem;/* 11px */
+
+  /* Font weights */
+  --weight-regular:  400;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Line heights */
+  --leading-tight:   1.2;
+  --leading-snug:    1.4;
+  --leading-normal:  1.65;
+  --leading-loose:   1.75;
+}
+
+/* Type roles */
+
+.text-display    { font-family: var(--font-primary); font-size: var(--text-display);    font-weight: var(--weight-bold);     line-height: var(--leading-tight); }
+.text-heading-1  { font-family: var(--font-primary); font-size: var(--text-heading-1);  font-weight: var(--weight-bold);     line-height: var(--leading-tight); }
+.text-heading-2  { font-family: var(--font-primary); font-size: var(--text-heading-2);  font-weight: var(--weight-semibold); line-height: var(--leading-snug); }
+.text-heading-3  { font-family: var(--font-primary); font-size: var(--text-heading-3);  font-weight: var(--weight-semibold); line-height: var(--leading-snug); }
+.text-body-lg    { font-family: var(--font-pairing); font-size: var(--text-body-lg);    font-weight: var(--weight-regular);  line-height: var(--leading-normal); }
+.text-body       { font-family: var(--font-pairing); font-size: var(--text-body);       font-weight: var(--weight-regular);  line-height: var(--leading-loose); }
+.text-body-sm    { font-family: var(--font-pairing); font-size: var(--text-body-sm);    font-weight: var(--weight-regular);  line-height: var(--leading-normal); }
+.text-caption    { font-family: var(--font-pairing); font-size: var(--text-caption);    font-weight: var(--weight-regular);  line-height: var(--leading-normal); }
+.text-label      { font-family: var(--font-pairing); font-size: var(--text-label);      font-weight: var(--weight-semibold); line-height: var(--leading-snug);   text-transform: uppercase; letter-spacing: 0.05em; }
+`;
+}
+
+function exportCSS() {
+  document.getElementById('css-code').textContent = buildCSS();
+  document.getElementById('css-modal').classList.add('visible');
+}
+
+function closeCSSModal() {
+  document.getElementById('css-modal').classList.remove('visible');
+  document.getElementById('copy-status').classList.remove('visible');
+}
+
+function copyCSS() {
+  const code = document.getElementById('css-code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const status = document.getElementById('copy-status');
+    status.classList.add('visible');
+    setTimeout(() => status.classList.remove('visible'), 2000);
+  }).catch(err => {
+    alert('Could not copy: ' + err.message);
+  });
+}
+
+function downloadCSS() {
+  const code = buildCSS();
+  const primary = state.primaryFont.family.replace(/\s+/g, '-').toLowerCase();
+  const pairing = state.pairingFont.family.replace(/\s+/g, '-').toLowerCase();
+  const blob = new Blob([code], { type: 'text/css' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `type-system-${primary}-${pairing}.css`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function startOver() {
+  state.primaryFont = null;
+  state.pairingFont = null;
+  document.querySelectorAll('.font-card.selected').forEach(c => c.classList.remove('selected'));
+  hideBar();
+  goToStep(1);
+}
+
+// ================================================================
+//  UTIL
+// ================================================================
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ================================================================
+//  INIT
+// ================================================================
+
+// Returning users skip the welcome screen and land directly in the app
+if (localStorage.getItem('tsb_welcomed') === '1') {
+  document.getElementById('welcome-overlay').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  bootstrap();
+}
+// First-time visitors see the welcome overlay; dismissWelcome() chains them into the app
+</script>
+</body>
+</html>
