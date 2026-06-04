@@ -659,8 +659,26 @@
     /* ── STEP PANELS ────────────────────────────────────────── */
 
     .step-panel { display: none; }
-    .step-panel.active { display: block; }
+    .step-panel.active {
+      display: block;
+      animation: page-fade-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
     #panel-1.active { display: grid; }
+
+    @keyframes page-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .step-panel.active { animation: none; }
+    }
 
     /* ── STEP 2 + 3 shared ───────────────────────────────────── */
 
@@ -1939,7 +1957,16 @@ function dismissWelcome() {
 }
 
 function goToWelcome() {
-  document.getElementById('welcome-overlay').style.display = 'flex';
+  const overlay = document.getElementById('welcome-overlay');
+  overlay.style.display = 'flex';
+  // Re-trigger the staggered entrance animations
+  overlay.querySelectorAll(
+    '.welcome-eyebrow, .welcome-hero, .welcome-tagline, .welcome-sub, .welcome-cta, .welcome-footer'
+  ).forEach(el => {
+    el.style.animation = 'none';
+    void el.offsetWidth; // force reflow
+    el.style.animation = '';
+  });
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
