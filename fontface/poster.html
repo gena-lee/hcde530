@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fontface — Poster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500;1,600&family=Playfair+Display:ital,wght@1,400;1,700&family=Lato:wght@400;700&family=Cormorant+Garamond:ital,wght@1,500&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #f5f3ef;
+      --ink:         #1c1b19;
+      --accent:      #2b3055;
+      --muted:       #7a7570;
+      --rule:        #dedad3;
+    }
+
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    /* Download button — fixed in corner, hidden during capture */
+    #download-btn {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 9999;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 100px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+      transition: transform 0.1s, opacity 0.15s;
+    }
+
+    #download-btn:hover { transform: translateY(-1px); }
+    #download-btn:disabled { opacity: 0.6; cursor: wait; }
+    body.capturing #download-btn { display: none; }
+
+    .poster {
+      width: 1920px;
+      height: 1080px;
+      padding: 80px 100px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 56px;
+      position: relative;
+    }
+
+    /* ── TOP BAR ─────────────────────────────────────────────── */
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .eyebrow {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .top-meta {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    .top-meta strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 90px;
+      align-items: center;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      gap: 38px;
+    }
+
+    .wordmark {
+      font-size: 280px;
+      line-height: 0.95;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: baseline;
+    }
+
+    .wm-font {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 0.82em;
+      letter-spacing: -8px;
+    }
+
+    .wm-face {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-weight: 500;
+      letter-spacing: -3px;
+      color: var(--accent);
+      margin-left: 12px;
+    }
+
+    .wm-caret {
+      display: inline-block;
+      width: 11px;
+      height: 0.78em;
+      background: var(--accent);
+      margin-left: 22px;
+      border-radius: 2px;
+      transform: skewX(-12deg);
+      transform-origin: bottom center;
+      align-self: baseline;
+    }
+
+    .tagline {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 44px;
+      line-height: 1.25;
+      color: var(--ink);
+      max-width: 560px;
+      letter-spacing: -0.5px;
+    }
+
+    .tagline em {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .description {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--muted);
+      max-width: 460px;
+    }
+
+    /* ── SPECIMEN CARDS (right side) ────────────────────────── */
+
+    .specimens {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .specimen {
+      padding: 26px 30px;
+      border: 1.5px solid var(--rule);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .specimen-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .specimen-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .spec-display {
+      font-size: 42px;
+      line-height: 1.1;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .spec-body {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .spec-1 .spec-display { font-family: 'Playfair Display', serif; font-weight: 700; }
+    .spec-1 .spec-body    { font-family: 'Lato', sans-serif; }
+
+    .spec-2 .spec-display { font-family: 'EB Garamond', serif; font-weight: 700; }
+    .spec-2 .spec-body    { font-family: 'Inter', sans-serif; }
+
+    .spec-3 .spec-display { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 500; }
+    .spec-3 .spec-body    { font-family: 'Manrope', sans-serif; }
+
+    .spec-credits {
+      margin-top: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    /* ── BOTTOM ──────────────────────────────────────────────── */
+
+    .bottom-bar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-top: 1.5px solid var(--rule);
+      padding-top: 32px;
+    }
+
+    .steps {
+      display: flex;
+      gap: 36px;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .step-num {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+
+    .step-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: 0.2px;
+    }
+
+    .url-block {
+      text-align: right;
+    }
+
+    .url-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .url {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 26px;
+      color: var(--ink);
+      letter-spacing: 0.2px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="poster">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="eyebrow">A Type System Builder · 2026</div>
+    <div class="top-meta"><strong>Fontface</strong> &nbsp;·&nbsp; HCDE 530</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+
+    <div class="hero-left">
+      <div class="wordmark">
+        <span class="wm-font">Font</span><span class="wm-face">face</span><span class="wm-caret"></span>
+      </div>
+      <div class="tagline">
+        Build beautiful <em>type systems</em><br>in five guided steps.
+      </div>
+      <div class="description">
+        Pick a primary font, find pairings, preview your hierarchy with real text,
+        and export ready-to-use CSS. All in your browser — no signup required.
+      </div>
+    </div>
+
+    <div class="specimens">
+
+      <div class="specimen spec-1">
+        <div class="specimen-label">01 · Editorial</div>
+        <div class="spec-display">The Art of Pairing</div>
+        <div class="spec-body">Headlines that feel timeless, body text that reads with ease — typography speaks before words do.</div>
+        <div class="spec-credits">Playfair Display · Lato</div>
+      </div>
+
+      <div class="specimen spec-2">
+        <div class="specimen-label">02 · Modern</div>
+        <div class="spec-display">Form Meets Function</div>
+        <div class="spec-body">A classical serif paired with a precision-crafted sans gives every system a quiet confidence.</div>
+        <div class="spec-credits">EB Garamond · Inter</div>
+      </div>
+
+      <div class="specimen spec-3">
+        <div class="specimen-label">03 · Refined</div>
+        <div class="spec-display">Crafted for Every Scale</div>
+        <div class="spec-body">From display to caption, a thoughtful pairing creates rhythm and hierarchy without trying.</div>
+        <div class="spec-credits">Cormorant Garamond · Manrope</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar">
+    <div class="steps">
+      <div class="step"><span class="step-num">01</span><span class="step-name">Filter</span></div>
+      <div class="step"><span class="step-num">02</span><span class="step-name">Pick Primary</span></div>
+      <div class="step"><span class="step-num">03</span><span class="step-name">Choose Pairing</span></div>
+      <div class="step"><span class="step-num">04</span><span class="step-name">Preview</span></div>
+      <div class="step"><span class="step-num">05</span><span class="step-name">Export</span></div>
+    </div>
+    <div class="url-block">
+      <div class="url-label">Try the tool</div>
+      <div class="url">gena-lee.github.io/hcde530/fontface</div>
+    </div>
+  </div>
+
+</div>
+
+<button id="download-btn" onclick="downloadPoster()">↓ Download as PNG</button>
+
+<script>
+function downloadPoster() {
+  const btn = document.getElementById('download-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+  document.body.classList.add('capturing');
+
+  html2canvas(document.querySelector('.poster'), {
+    backgroundColor: '#f5f3ef',
+    scale: 1,
+    width: 1920,
+    height: 1080,
+    windowWidth: 1920,
+    windowHeight: 1080,
+    useCORS: true,
+    logging: false,
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'fontface-poster-1920x1080.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }).catch(err => {
+    console.error(err);
+    alert('Could not generate poster: ' + err.message);
+  }).finally(() => {
+    document.body.classList.remove('capturing');
+    btn.disabled = false;
+    btn.textContent = '↓ Download as PNG';
+  });
+}
+</script>
+
+</body>
+</html>

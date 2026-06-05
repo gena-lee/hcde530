@@ -78,6 +78,8 @@
       font-weight: 700;
       font-size: 0.82em;
       letter-spacing: -3.5px;
+      position: relative;
+      cursor: default;
     }
 
     .welcome-hero .wh-face {
@@ -87,7 +89,35 @@
       letter-spacing: -1.5px;
       color: var(--accent);
       margin-left: 4px;
+      position: relative;
+      cursor: default;
     }
+
+    /* Floating font-name tooltip that follows the cursor */
+    .font-tooltip {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: #ffffff;
+      color: var(--accent);
+      padding: 6px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-style: normal;
+      font-weight: 600;
+      font-size: 10px;
+      letter-spacing: 0.3px;
+      line-height: 1.2;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      z-index: 1200;
+    }
+
+    .font-tooltip.visible { opacity: 1; }
 
     .welcome-hero .wh-caret {
       display: inline-block;
@@ -362,12 +392,28 @@
     .app-shell {
       display: grid;
       grid-template-columns: 240px minmax(0, 780px);
+      grid-template-areas:
+        "ai   ai"
+        "side main";
       align-items: start;
-      gap: 28px;
+      gap: 0 28px;
       max-width: 1160px;
       margin: 0 auto;
       padding: 36px 80px 120px;
     }
+
+    #panel-1 > .ai-section {
+      grid-area: ai;
+      margin-bottom: 60px;
+      min-height: calc(100vh - 110px);   /* fill viewport so browse is below the fold */
+      display: flex;
+      flex-direction: column;
+    }
+    #panel-1 > .sidebar      { grid-area: side; }
+    #panel-1 > .results-area { grid-area: main; }
+
+    /* "Or browse all fonts ↓" lands the results header just below the sticky page header */
+    #browse-section { scroll-margin-top: 68px; }   /* 54px sticky header + 14px breathing room */
 
     /* ── SIDEBAR ─────────────────────────────────────────────── */
 
@@ -496,6 +542,353 @@
       display: flex;
       flex-direction: column;
       min-width: 0;
+    }
+
+    /* ── AI section — chat-style input ─────────────────────── */
+
+    .ai-section {
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .ai-scroll-down {
+      display: block;
+      align-self: center;
+      margin-top: auto;              /* push to bottom of the ai-section flex column */
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: color 0.15s;
+    }
+
+    .ai-scroll-down:hover { color: var(--accent); }
+
+    .ai-scroll-down .arrow {
+      display: inline-block;
+      margin-left: 6px;
+      transition: transform 0.2s;
+    }
+
+    .ai-scroll-down:hover .arrow {
+      transform: translateY(3px);
+    }
+
+    .ai-hero {
+      text-align: center;
+      padding-top: 48px;
+      margin-bottom: 30px;
+    }
+
+    .ai-hero-icon {
+      font-size: 26px;
+      margin-bottom: 18px;
+      display: inline-block;
+      color: var(--accent);
+    }
+
+    .ai-hero-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -1.6px;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .ai-hero-title em {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      letter-spacing: -1px;
+      color: var(--accent);
+      margin-left: 6px;
+    }
+
+    .ai-hero-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .ai-chat-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 22px 14px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.03);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ai-chat-card:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(43,48,85,0.08);
+    }
+
+    .ai-chat-card.dragging {
+      border-color: var(--accent);
+      border-style: dashed;
+      background: var(--surface-2);
+    }
+
+    #ai-text {
+      width: 100%;
+      border: none;
+      background: transparent;
+      resize: none;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text);
+      padding: 4px 2px;
+      min-height: 56px;
+      max-height: 220px;
+      outline: none;
+      overflow-y: auto;
+    }
+
+    #ai-text::placeholder {
+      color: var(--text-muted);
+    }
+
+    #ai-images-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    #ai-images-grid[hidden] { display: none; }
+
+    .ai-image-tile {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .ai-image-tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      cursor: zoom-in;
+    }
+
+    /* ── Image lightbox ──────────────────────────────────────── */
+
+    #image-lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 24, 41, 0.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 60px;
+      cursor: zoom-out;
+      animation: lightbox-fade 0.2s ease-out;
+    }
+
+    #image-lightbox[hidden] { display: none; }
+
+    @keyframes lightbox-fade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    #image-lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+      animation: lightbox-zoom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes lightbox-zoom {
+      from { transform: scale(0.92); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.13s;
+    }
+
+    .lightbox-close:hover { background: rgba(255, 255, 255, 0.28); }
+
+    .ai-tile-remove {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      font-size: 12px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.13s;
+    }
+
+    .ai-tile-remove:hover { background: rgba(0,0,0,0.9); }
+
+    .ai-chat-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      margin-top: 14px;
+      gap: 12px;
+    }
+
+    .ai-attach {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      flex-shrink: 0;
+      transition: background 0.13s, color 0.13s, border-color 0.13s;
+    }
+
+    .ai-attach:hover {
+      background: var(--surface-2);
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    .ai-send {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      padding: 10px 22px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s, opacity 0.15s;
+    }
+
+    .ai-send:hover:not(:disabled) { background: var(--accent-hover); }
+    .ai-send:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .ai-submit-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ai-stop {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      flex-shrink: 0;
+      transition: background 0.13s, color 0.13s, border-color 0.13s;
+    }
+
+    .ai-stop[hidden] { display: none; }
+
+    .ai-stop:hover {
+      background: var(--text);
+      color: #fff;
+      border-color: var(--text);
+    }
+
+    .ai-spinner {
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: ai-spin 0.7s linear infinite;
+    }
+
+    .ai-spinner[hidden] { display: none; }
+
+    @keyframes ai-spin { to { transform: rotate(360deg); } }
+
+    #ai-error {
+      font-size: 13px;
+      color: #c0392b;
+      background: #fdf0ef;
+      border: 1px solid #f5c6c2;
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    .ai-results-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    /* AI results spans full content width even on the chat-card-sized panel */
+    #ai-results .font-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .results-header {
@@ -688,30 +1081,32 @@
 
     .primary-highlight {
       border-left: 3px solid var(--accent);
-      padding: 6px 0 6px 20px;
-      margin-bottom: 36px;
+      padding: 10px 0 12px 28px;
+      margin-bottom: 44px;
     }
 
     .primary-role {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       color: var(--text-muted);
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
 
     .primary-font-name {
-      font-size: 32px;
-      line-height: 1.15;
+      font-size: 64px;
+      line-height: 1.1;
+      letter-spacing: -1px;
       color: var(--text);
-      margin-bottom: 6px;
+      margin-bottom: 14px;
     }
 
     .primary-font-desc {
-      font-size: 13px;
+      font-size: 15px;
       color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.6;
+      max-width: 580px;
     }
 
     .pairing-intro-text {
@@ -1266,6 +1661,104 @@
 
     .font-select-pill:focus { outline: none; border-color: var(--accent); }
 
+    /* ── Custom font-picker (used in step 4 dropdowns) ──────── */
+
+    .fp-select {
+      position: relative;
+      width: 100%;
+    }
+
+    .fp-trigger {
+      width: 100%;
+      text-align: left;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 30px 6px 13px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a7570' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+      cursor: pointer;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fp-trigger:hover { border-color: var(--accent); }
+    .fp-select.open .fp-trigger { border-color: var(--accent); }
+
+    .fp-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+      z-index: 250;
+      display: none;
+      flex-direction: column;
+      max-height: 360px;
+      overflow: hidden;
+    }
+
+    .fp-select.open .fp-menu { display: flex; }
+
+    .fp-search {
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 11px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .fp-search::placeholder { color: var(--text-muted); }
+
+    .fp-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .fp-option {
+      padding: 8px 14px;
+      font-size: 15px;
+      line-height: 1.3;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+      transition: background 0.1s;
+    }
+
+    .fp-option:hover,
+    .fp-option.highlighted { background: var(--surface-2); }
+
+    .fp-option.selected {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .fp-option.selected.highlighted { background: var(--accent-hover); }
+
+    .fp-empty {
+      padding: 18px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
     .size-wrap {
       display: flex;
       align-items: center;
@@ -1346,6 +1839,37 @@
     .preview-card[data-theme="light"] .preview-meta-lbl { color: var(--text-muted); }
     .preview-card[data-theme="dark"]  .preview-meta-lbl { color: rgba(255,255,255,0.35); }
 
+    /* Figma-style drag scrubber on the size labels */
+    .scrubbable {
+      cursor: ns-resize;
+      user-select: none;
+      padding: 4px 9px;
+      margin: -4px -9px;
+      border-radius: 6px;
+      transition: background 0.12s, color 0.12s;
+      position: relative;
+    }
+
+    .scrubbable:hover {
+      background: var(--surface-2);
+      color: var(--text) !important;
+    }
+
+    .preview-card[data-theme="dark"] .scrubbable:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff !important;
+    }
+
+    .scrubbable.dragging {
+      background: var(--accent);
+      color: #fff !important;
+    }
+
+    body.is-scrubbing {
+      cursor: ns-resize;
+      user-select: none;
+    }
+
     .preview-section {
       overflow: hidden;
     }
@@ -1365,7 +1889,7 @@
     .preview-card[data-theme="dark"]  .preview-editable { color: #f0eeea; }
 
     .prev-display { font-size: 56px; line-height: 1.15; letter-spacing: -1.5px; font-weight: 700; }
-    .prev-heading { font-size: 32px; line-height: 1.3;  letter-spacing: -0.3px; font-weight: 400; }
+    .prev-heading { font-size: 40px; line-height: 1.3;  letter-spacing: -0.3px; font-weight: 400; }
     .prev-body    { font-size: 16px; line-height: 1.75; font-weight: 400; max-width: 680px; }
     .prev-caption { font-size: 12px; line-height: 1.6;  font-weight: 400; color: inherit; opacity: 0.65; max-width: 580px; }
 
@@ -1579,9 +2103,10 @@
 
 <!-- ── WELCOME OVERLAY ───────────────────────────────────────── -->
 <div id="welcome-overlay">
+  <div class="font-tooltip" id="font-tooltip" aria-hidden="true"></div>
   <div class="welcome-card">
     <div class="welcome-eyebrow">A Type System Builder</div>
-    <h1 class="welcome-hero"><span class="wh-font">Font</span><span class="wh-face">face</span><span class="wh-caret" aria-hidden="true"></span></h1>
+    <h1 class="welcome-hero"><span class="wh-font" data-font="Inter Bold">Font</span><span class="wh-face" data-font="EB Garamond Italic">face</span><span class="wh-caret" aria-hidden="true"></span></h1>
     <p class="welcome-tagline">Build beautiful type systems in five guided steps.</p>
     <p class="welcome-sub">
       Pick a primary font, find pairings, preview your hierarchy with real text,
@@ -1618,6 +2143,47 @@
 
   <!-- Step 1 -->
   <div class="app-shell step-panel active" id="panel-1">
+
+    <!-- AI section — full-width across the grid (top row) -->
+    <section class="ai-section" id="ai-section">
+      <div class="ai-hero">
+        <div class="ai-hero-icon">✦</div>
+        <h2 class="ai-hero-title">Find your <em>fonts</em></h2>
+        <p class="ai-hero-sub">Describe your brand or vibe, drop in moodboard images — or both. Gemini will suggest fonts that match.</p>
+      </div>
+
+      <form class="ai-chat-card" id="ai-chat-card" onsubmit="event.preventDefault(); submitAI();">
+        <input type="file" id="ai-file" accept="image/*" multiple hidden>
+
+        <textarea id="ai-text" rows="2"
+                  placeholder="Describe your project, brand, or aesthetic…"></textarea>
+
+        <div id="ai-images-grid" hidden></div>
+
+        <div class="ai-chat-actions">
+          <button type="button" class="ai-attach"
+                  onclick="document.getElementById('ai-file').click()"
+                  aria-label="Add image (or drop / paste)" title="Add image">+</button>
+
+          <div class="ai-submit-group">
+            <button type="button" id="ai-stop" class="ai-stop" hidden onclick="abortAI()" aria-label="Stop analyzing" title="Stop">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><rect width="10" height="10" rx="1.2"/></svg>
+            </button>
+            <button type="submit" id="ai-submit" class="ai-send">
+              <span class="ai-spinner" id="ai-spinner" hidden></span>
+              <span class="ai-send-label" id="ai-send-label">Find fonts →</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div id="ai-error" hidden></div>
+      <div id="ai-results"></div>
+
+      <button type="button" class="ai-scroll-down" onclick="scrollToBrowse()">
+        Or browse all fonts <span class="arrow">↓</span>
+      </button>
+    </section>
 
     <!-- Sidebar / Filters -->
     <aside class="sidebar" aria-label="Filters">
@@ -1656,8 +2222,8 @@
 
     </aside>
 
-    <!-- Results -->
-    <main class="results-area" aria-live="polite">
+    <!-- Browse section: filter results -->
+    <main class="results-area" id="browse-section" aria-live="polite">
       <div class="results-header">
         <span class="results-count" id="results-count">Loading fonts…</span>
         <div class="sort-row">
@@ -1716,6 +2282,12 @@
   </div>
 
 </div><!-- /app -->
+
+<!-- Image lightbox (used for AI moodboard previews) -->
+<div id="image-lightbox" hidden onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="event.stopPropagation(); closeLightbox()" aria-label="Close">×</button>
+  <img id="image-lightbox-img" alt="Expanded reference image">
+</div>
 
 <!-- Export CSS modal -->
 <div class="modal-overlay" id="css-modal" onclick="if(event.target===this)closeCSSModal()">
@@ -1937,6 +2509,9 @@ const state = {
   sort:         'popularity',
   primaryFont:  null,
   pairingFont:  null,
+  // Anchor sizes the user picks in step 4 — these drive step 5's full scale and the exported CSS.
+  // "heading" maps to H1 (primary heading); H2 and H3 are derived smaller.
+  userSizes:    { display: 56, heading: 40, body: 16, caption: 12 },
 };
 
 // ================================================================
@@ -1956,9 +2531,39 @@ function dismissWelcome() {
 }
 
 function goToWelcome() {
+  // ── Reset all app state so "Start building" returns to a fresh Step 1 ──
+
+  // Clear font selections
+  state.primaryFont = null;
+  state.pairingFont = null;
+  document.querySelectorAll('.font-card.selected').forEach(c => c.classList.remove('selected'));
+  hideBar();
+
+  // Clear filters (resets search, categories, moods, useCases + UI)
+  if (typeof clearFilters === 'function' && document.getElementById('search-input')) {
+    clearFilters();
+  }
+
+  // Reset sort dropdown to popularity
+  const sortSel = document.getElementById('sort-select');
+  if (sortSel) {
+    state.sort = 'popularity';
+    sortSel.value = 'popularity';
+  }
+
+  // Reset AI mode: clear inputs, results, image, switch back to Browse tab
+  const aiText = document.getElementById('ai-text');
+  if (aiText) aiText.value = '';
+  if (typeof clearAIImage === 'function') clearAIImage();
+  const aiResults = document.getElementById('ai-results');
+  if (aiResults) aiResults.innerHTML = '';
+  if (typeof hideAIError === 'function') hideAIError();
+  // Snap back to Step 1 so the underlying app shows step 1 once welcome dismisses
+  if (currentStep !== 1) goToStep(1);
+
+  // ── Show welcome overlay + re-trigger entrance animations ──
   const overlay = document.getElementById('welcome-overlay');
   overlay.style.display = 'flex';
-  // Re-trigger the staggered entrance animations
   overlay.querySelectorAll(
     '.welcome-eyebrow, .welcome-hero, .welcome-tagline, .welcome-sub, .welcome-cta, .welcome-footer'
   ).forEach(el => {
@@ -1968,6 +2573,29 @@ function goToWelcome() {
   });
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
+
+// Font-name tooltip follows the cursor (top-left of pointer) while hovering the hero spans
+(function setupFontTooltip() {
+  const tooltip = document.getElementById('font-tooltip');
+  const targets = document.querySelectorAll('.welcome-hero .wh-font, .welcome-hero .wh-face');
+  const gap = 12;
+
+  targets.forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      tooltip.textContent = el.getAttribute('data-font');
+      tooltip.classList.add('visible');
+    });
+    el.addEventListener('mousemove', e => {
+      // Position the tooltip's bottom-right corner at (cursor - gap)
+      // so it floats above and to the left of the pointer
+      tooltip.style.transform =
+        `translate(${e.clientX - gap}px, ${e.clientY - gap}px) translate(-100%, -100%)`;
+    });
+    el.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+    });
+  });
+})();
 
 // ================================================================
 //  BOOTSTRAP
@@ -2012,6 +2640,409 @@ function toggleCatPill(el, cat) {
 //  GOOGLE FONTS FETCH
 // ================================================================
 
+// ================================================================
+//  AI MODE — Gemini-powered font recommendations
+// ================================================================
+
+// Embed your Gemini API key here. Get one at https://aistudio.google.com/apikey
+// Restrict it in Google Cloud Console → Credentials → HTTP referrers:
+//   https://gena-lee.github.io/*
+//   http://localhost/*
+//   file:///*
+const GEMINI_API_KEY = 'AIzaSyC2BeZd_LHsHOSNcqBXNwSpb-pnqquE2Kg';
+const GEMINI_MODEL   = 'gemini-2.0-flash';
+const GEMINI_URL     = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+const MAX_AI_IMAGES = 5;
+
+let aiState = {
+  images: [],   // [{ base64, mime, name, dataUrl }]
+};
+
+// Switch between Browse and AI modes
+// Smoothly scroll the page down to the browse-grid section
+function scrollToBrowse() {
+  const section = document.getElementById('browse-section');
+  if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Image upload handling ────────────────────────────────────
+
+function handleImageFiles(files) {
+  const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (!imageFiles.length) {
+    showAIError('Please upload image files (JPG, PNG, etc.).');
+    return;
+  }
+
+  const remaining = MAX_AI_IMAGES - aiState.images.length;
+  if (remaining <= 0) {
+    showAIError(`You can attach up to ${MAX_AI_IMAGES} images.`);
+    return;
+  }
+
+  const toAdd = imageFiles.slice(0, remaining);
+  if (imageFiles.length > remaining) {
+    showAIError(`Only added ${remaining}; max is ${MAX_AI_IMAGES} images.`);
+  } else {
+    hideAIError();
+  }
+
+  toAdd.forEach(file => {
+    if (file.size > 8 * 1024 * 1024) {
+      showAIError(`"${file.name}" is too large (max 8MB each).`);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      aiState.images.push({
+        base64:  dataUrl.split(',')[1],
+        mime:    file.type,
+        name:    file.name,
+        dataUrl: dataUrl,
+      });
+      renderAIImages();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderAIImages() {
+  const grid = document.getElementById('ai-images-grid');
+  if (!grid) return;
+  if (!aiState.images.length) {
+    grid.hidden = true;
+    grid.innerHTML = '';
+    return;
+  }
+  grid.hidden = false;
+  grid.innerHTML = aiState.images.map((img, idx) => `
+    <div class="ai-image-tile">
+      <img src="${img.dataUrl}" alt="Reference ${idx + 1}" onclick="openLightbox(${idx})">
+      <button class="ai-tile-remove" onclick="event.stopPropagation(); removeAIImage(${idx})" aria-label="Remove image">×</button>
+    </div>
+  `).join('');
+}
+
+function openLightbox(idx) {
+  const img = aiState.images[idx];
+  if (!img) return;
+  const lb     = document.getElementById('image-lightbox');
+  const lbImg  = document.getElementById('image-lightbox-img');
+  lbImg.src    = img.dataUrl;
+  lbImg.alt    = img.name || `Reference ${idx + 1}`;
+  lb.hidden    = false;
+}
+
+function closeLightbox() {
+  document.getElementById('image-lightbox').hidden = true;
+}
+
+// Global: Escape closes the lightbox (registered once)
+if (!window._lightboxEscWired) {
+  window._lightboxEscWired = true;
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      const lb = document.getElementById('image-lightbox');
+      if (lb && !lb.hidden) closeLightbox();
+    }
+  });
+}
+
+function removeAIImage(idx) {
+  aiState.images.splice(idx, 1);
+  renderAIImages();
+}
+
+// Clear ALL attached images (used by reset/welcome navigation and on submit)
+function clearAIImage() {
+  aiState.images = [];
+  renderAIImages();
+  const fileInput = document.getElementById('ai-file');
+  if (fileInput) fileInput.value = '';
+}
+
+// Wire drop zone events once on page load
+(function setupAIDropZone() {
+  const card      = document.getElementById('ai-chat-card');
+  const fileInput = document.getElementById('ai-file');
+  if (!card || !fileInput) return;
+
+  fileInput.addEventListener('change', e => {
+    if (e.target.files.length) handleImageFiles(e.target.files);
+    e.target.value = '';   // reset so picking the same file again still fires change
+  });
+
+  // The whole chat card is the drop target — feels more cohesive
+  let dragDepth = 0;
+  card.addEventListener('dragenter', e => {
+    e.preventDefault();
+    dragDepth++;
+    card.classList.add('dragging');
+  });
+  card.addEventListener('dragover', e => {
+    e.preventDefault();
+  });
+  card.addEventListener('dragleave', e => {
+    e.preventDefault();
+    dragDepth--;
+    if (dragDepth <= 0) {
+      dragDepth = 0;
+      card.classList.remove('dragging');
+    }
+  });
+  card.addEventListener('drop', e => {
+    e.preventDefault();
+    dragDepth = 0;
+    card.classList.remove('dragging');
+    if (e.dataTransfer.files.length) handleImageFiles(e.dataTransfer.files);
+  });
+
+  // Auto-resize textarea as user types
+  const textarea = document.getElementById('ai-text');
+  if (textarea) {
+    const resize = () => {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(220, textarea.scrollHeight) + 'px';
+    };
+    textarea.addEventListener('input', resize);
+    // Cmd/Ctrl+Enter submits
+    textarea.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        submitAI();
+      }
+    });
+  }
+
+  // Paste from clipboard — only active when on step 1 (the AI section)
+  document.addEventListener('paste', e => {
+    if (currentStep !== 1) return;
+
+    const items = (e.clipboardData || window.clipboardData)?.items;
+    if (!items) return;
+
+    const imageFiles = Array.from(items)
+      .filter(item => item.kind === 'file' && item.type.startsWith('image/'))
+      .map(item => item.getAsFile())
+      .filter(Boolean);
+
+    if (imageFiles.length) {
+      e.preventDefault();
+      handleImageFiles(imageFiles);
+    }
+  });
+})();
+
+// ── Gemini API call ──────────────────────────────────────────
+
+function buildGeminiPrompt(brief) {
+  // Send the curated FONT_META list as a catalog Gemini must pick from
+  const catalog = Object.entries(FONT_META)
+    .map(([family, meta]) => {
+      const moods = meta.m.join(', ');
+      const uses  = meta.u.join(', ');
+      return `- ${family} — moods: [${moods}], use cases: [${uses}]`;
+    })
+    .join('\n');
+
+  const imageCount = aiState.images.length;
+  const imageNote  = imageCount
+    ? `The designer also attached ${imageCount} reference image${imageCount === 1 ? '' : 's'} (moodboards or screenshots of fonts they like). Consider their style, mood, and any visible typography.`
+    : '';
+
+  return `You are a typography expert helping a designer choose fonts for their project.
+
+The designer's brief:
+"${brief || '(No written brief — base recommendations on the attached reference image(s) only.)'}"
+
+${imageNote}
+
+Pick 4 to 6 fonts from the catalog below that best match this brief. For each recommendation, write ONE concise sentence explaining specifically why it fits the brief (refer to mood, use case, or visible style).
+
+Respond in this exact JSON format and nothing else:
+{
+  "recommendations": [
+    { "family": "Inter", "reason": "Clean, modern sans-serif that..." }
+  ]
+}
+
+The "family" value MUST exactly match a font name from this catalog:
+
+${catalog}`;
+}
+
+async function callGeminiForFonts(brief, signal) {
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+    throw new Error('AI mode is not configured yet. Add your Gemini API key in the code.');
+  }
+
+  const parts = [{ text: buildGeminiPrompt(brief) }];
+  aiState.images.forEach(img => {
+    parts.push({
+      inline_data: {
+        mime_type: img.mime,
+        data:      img.base64,
+      },
+    });
+  });
+
+  const body = {
+    contents: [{ parts }],
+    generationConfig: {
+      temperature:      0.7,
+      response_mime_type: 'application/json',
+    },
+  };
+
+  const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(body),
+    signal,
+  });
+
+  if (!res.ok) {
+    if (res.status === 429) throw new Error('AI mode has reached its daily limit. Try again tomorrow — or scroll down to browse all fonts manually.');
+    if (res.status === 400) throw new Error('Gemini rejected the request. The image may be too large or in an unsupported format.');
+    const text = await res.text().catch(() => '');
+    throw new Error(`API error (${res.status}). ${text.slice(0, 120)}`);
+  }
+
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('Unexpected response shape from Gemini.');
+
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error('Gemini returned non-JSON. Try rewording your brief.');
+  }
+
+  const recs = (parsed.recommendations || [])
+    .filter(r => r && r.family && r.reason)
+    .filter(r => allFonts.find(f => f.family === r.family));   // must be a real Google Font we have
+
+  if (!recs.length) throw new Error('No valid recommendations returned. Try a different brief.');
+
+  return recs.slice(0, 6);
+}
+
+// ── Render AI results as font cards (reuses existing card styling) ──
+
+function renderAIResults(recommendations) {
+  const out = document.getElementById('ai-results');
+  if (!recommendations.length) {
+    out.innerHTML = '';
+    return;
+  }
+
+  loadFontCSS(recommendations.map(r => r.family));
+
+  const cards = recommendations.map(rec => {
+    const font   = allFonts.find(f => f.family === rec.family);
+    const safe   = escHtml(rec.family);
+    const safej  = rec.family.replace(/'/g, "\\'");
+    const cat    = font ? (CAT_LABELS[font.category] || font.category) : '';
+
+    const weights = font ? font.variants
+      .map(v => v === 'regular' ? '400' : v === 'italic' ? null : v.replace('italic',''))
+      .filter(v => v && /^\d+$/.test(v))
+      .filter((v, i, arr) => arr.indexOf(v) === i)
+      .sort((a, b) => +a - +b) : [];
+    const weightTags = weights.map(w => `<span class="card-weight">${w}</span>`).join('');
+
+    return `
+      <div class="font-card" data-family="${safe}" onclick="selectFont('${safej}')">
+        <span class="card-cat">${cat.toUpperCase()}</span>
+        <div class="card-name-display" style="font-family:'${safe}',serif;">${safe}</div>
+        <div class="card-abc" style="font-family:'${safe}',serif;">Aa Bb Cc 123</div>
+        <div class="card-desc">${escHtml(rec.reason)}</div>
+        <div class="card-weights">${weightTags}</div>
+      </div>`;
+  }).join('');
+
+  out.innerHTML = `
+    <div class="ai-results-label">${recommendations.length} recommended fonts</div>
+    <div class="font-grid">${cards}</div>
+  `;
+}
+
+// ── Submit handler ───────────────────────────────────────────
+
+let aiAbortController = null;
+
+async function submitAI() {
+  // Already analyzing — ignore (use the separate stop button to abort)
+  if (aiAbortController) return;
+
+  const brief = document.getElementById('ai-text').value.trim();
+  if (!brief && !aiState.images.length) {
+    showAIError('Add a description or attach an image (or both).');
+    return;
+  }
+
+  const submit  = document.getElementById('ai-submit');
+  const stopBtn = document.getElementById('ai-stop');
+  const spinner = document.getElementById('ai-spinner');
+  const label   = document.getElementById('ai-send-label');
+  hideAIError();
+  submit.disabled   = true;
+  spinner.hidden    = false;
+  label.textContent = 'Analyzing…';
+  stopBtn.hidden    = false;
+  document.getElementById('ai-results').innerHTML = '';
+
+  aiAbortController = new AbortController();
+
+  try {
+    const recs = await callGeminiForFonts(brief, aiAbortController.signal);
+    renderAIResults(recs);
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      // User clicked stop — silent recovery, no error shown
+    } else {
+      showAIError(err.message);
+    }
+  } finally {
+    aiAbortController = null;
+    submit.disabled   = false;
+    spinner.hidden    = true;
+    label.textContent = 'Find fonts →';
+    stopBtn.hidden    = true;
+  }
+}
+
+function abortAI() {
+  if (aiAbortController) aiAbortController.abort();
+}
+
+function showAIError(msg) {
+  const el = document.getElementById('ai-error');
+  el.textContent = msg;
+  el.hidden = false;
+}
+
+function hideAIError() {
+  document.getElementById('ai-error').hidden = true;
+}
+
+// Google Fonts ships icon/symbol/emoji fonts in the same API response as text fonts.
+// These render as gibberish (or empty boxes) when used for text, so filter them out.
+const NON_TEXT_FONT_PATTERNS = [
+  /^Material Icons/,
+  /^Material Symbols/,
+  /^Noto Color Emoji$/,
+  /^Noto Emoji$/,
+  /Symbols 2$/,
+];
+
+function isTextFont(family) {
+  return !NON_TEXT_FONT_PATTERNS.some(re => re.test(family));
+}
+
 async function fetchFonts() {
   const url = `https://www.googleapis.com/webfonts/v1/webfonts?key=${state.apiKey}&sort=popularity`;
   try {
@@ -2019,12 +3050,14 @@ async function fetchFonts() {
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     const data = await res.json();
 
-    allFonts = data.items.map(f => ({
-      family:   f.family,
-      category: f.category,
-      variants: f.variants,
-      meta:     FONT_META[f.family] || { m: [], u: [] },
-    }));
+    allFonts = data.items
+      .filter(f => isTextFont(f.family))
+      .map(f => ({
+        family:   f.family,
+        category: f.category,
+        variants: f.variants,
+        meta:     FONT_META[f.family] || { m: [], u: [] },
+      }));
 
     updateCounts();
     applyFilters();
@@ -2365,6 +3398,70 @@ function getPairingsByFamily(family) {
   return PAIRING_MAP[family] || ["Lato", "Open Sans", "Merriweather"];
 }
 
+function lookupCategory(family) {
+  const f = allFonts.find(f => f.family === family);
+  return f ? f.category : 'sans-serif';
+}
+
+function categoryFallback(category) {
+  switch (category) {
+    case 'serif':       return 'serif';
+    case 'monospace':   return 'monospace';
+    case 'handwriting': return 'cursive';
+    case 'display':     return 'sans-serif';
+    default:            return 'sans-serif';
+  }
+}
+
+// Generate a contextual "why this pairs" sentence for a specific primary + candidate combination.
+// Pulls from category contrast, shared moods, role complement, and curated-pair status.
+function pairingReason(primary, candidate) {
+  const pCat = primary.category;
+  const cCat = candidate.category;
+  const pm   = getMetaFor(primary);
+  const cm   = getMetaFor(candidate);
+  const pName = primary.family;
+  const cName = candidate.family;
+  const curated = (PAIRING_MAP[pName] || []).includes(cName);
+
+  // Category-contrast main phrase
+  let main;
+  if      (pCat === 'serif'       && cCat === 'sans-serif') main = `Clean sans-serif counterpoint to ${pName}'s editorial weight.`;
+  else if (pCat === 'sans-serif'  && cCat === 'serif')      main = `Brings classical depth to ${pName}'s functional clarity.`;
+  else if (pCat === 'sans-serif'  && cCat === 'sans-serif') main = `Shifts the tone with a sans that complements ${pName} side-by-side.`;
+  else if (pCat === 'serif'       && cCat === 'serif')      main = `A second serif voice that shifts emphasis away from ${pName}.`;
+  else if (pCat === 'display'     && cCat === 'sans-serif') main = `A quiet workhorse to carry body copy under ${pName}'s display energy.`;
+  else if (pCat === 'display'     && cCat === 'serif')      main = `Adds traditional gravitas to balance ${pName}'s expressive display.`;
+  else if (pCat === 'handwriting' && cCat === 'sans-serif') main = `Provides legible body text where ${pName}'s script can't.`;
+  else if (pCat === 'handwriting' && cCat === 'serif')      main = `Grounds ${pName}'s handwritten character with editorial structure.`;
+  else if (pCat === 'monospace'   && cCat === 'serif')      main = `Adds organic warmth to contrast ${pName}'s technical precision.`;
+  else if (pCat === 'monospace'   && cCat === 'sans-serif') main = `Offers a neutral, readable companion to ${pName}'s structured rhythm.`;
+  else if (cCat === 'display')                              main = `Steps up as a confident display voice against ${pName}.`;
+  else                                                      main = `Pairs across category to give ${pName} a complementary role.`;
+
+  // Supporting reason (mood or role)
+  const shared = pm.m.filter(m => cm.m.includes(m));
+  const pIsDisplay = pm.u.includes('display') || pm.u.includes('branding');
+  const pIsBody    = pm.u.includes('body-text');
+  const cIsDisplay = cm.u.includes('display') || cm.u.includes('branding');
+  const cIsBody    = cm.u.includes('body-text');
+
+  let support = '';
+  if (shared.length >= 2) {
+    support = ` Both feel ${shared[0]} and ${shared[1]}.`;
+  } else if (shared.length === 1) {
+    support = ` Both share a ${shared[0]} character.`;
+  } else if (pIsDisplay && cIsBody) {
+    support = ` Tuned for body text where ${pName} commands the display role.`;
+  } else if (pIsBody && cIsDisplay) {
+    support = ` Brings a confident headline voice alongside ${pName}'s body strength.`;
+  } else if (curated) {
+    support = ` A classic, hand-picked match.`;
+  }
+
+  return main + support;
+}
+
 // ================================================================
 //  STEP DATA
 // ================================================================
@@ -2439,12 +3536,20 @@ function goBack() {
 }
 
 function updateStepProgress(n) {
-  const info = STEP_INFO[n - 1];
-  document.getElementById('sp-inner').innerHTML = `
-    <div class="sp-counter">Step ${n} of ${STEP_INFO.length}</div>
-    <h1 class="sp-heading">${info.heading}</h1>
-    <p class="sp-subtitle">${info.subtitle}</p>
-  `;
+  // Step 1 hides the counter/heading entirely so AI mode reads as a clean focal point.
+  // Subsequent steps still show their counter + heading + subtitle.
+  const progress = document.getElementById('step-progress');
+  if (n === 1) {
+    progress.style.display = 'none';
+  } else {
+    progress.style.display = '';
+    const info = STEP_INFO[n - 1];
+    document.getElementById('sp-inner').innerHTML = `
+      <div class="sp-counter">Step ${n} of ${STEP_INFO.length}</div>
+      <h1 class="sp-heading">${info.heading}</h1>
+      <p class="sp-subtitle">${info.subtitle}</p>
+    `;
+  }
   updateHeaderSteps(n);
 }
 
@@ -2537,7 +3642,7 @@ function renderPairings(font) {
 
   loadFontCSS([font.family, ...pairings]);
 
-  const cards = pairings.map(p => pairingCardHTML(p)).join('');
+  const cards = pairings.map(p => pairingCardHTML(p, font)).join('');
 
   document.getElementById('step3-content').innerHTML = `
     <div class="primary-highlight">
@@ -2560,12 +3665,14 @@ function renderPairings(font) {
   `;
 }
 
-function pairingCardHTML(family) {
+function pairingCardHTML(family, primary) {
   const font    = allFonts.find(f => f.family === family);
   const safe    = escHtml(family);
   const safej   = family.replace(/'/g, "\\'");
   const cat     = font ? (CAT_LABELS[font.category] || font.category) : '';
-  const desc    = FONT_DESC[family] || (cat ? `A versatile ${cat.toLowerCase()} typeface.` : '');
+  const desc    = primary && font
+    ? pairingReason(primary, font)
+    : (FONT_DESC[family] || (cat ? `A versatile ${cat.toLowerCase()} typeface.` : ''));
 
   const weights = font ? font.variants
     .map(v => v === 'regular' ? '400' : v === 'italic' ? null : v.replace('italic',''))
@@ -2595,18 +3702,8 @@ function renderTypeSystem(primary, pairing) {
 
   loadFontCSS([primary.family, pairing.family]);
 
-  // Primary dropdown: all Google Fonts sorted A–Z (curated pairings for ~65, category fallback for the rest)
-  const primaryOpts = allFonts
-    .slice()
-    .sort((a, b) => a.family.localeCompare(b.family))
-    .map(f => `<option value="${escHtml(f.family)}" ${f.family === primary.family ? 'selected' : ''}>${escHtml(f.family)}</option>`)
-    .join('');
-
-  // Pairing dropdown: suggested pairings for the primary, with current selection pre-selected
-  const pairingCandidates = getPairingsByFamily(primary.family);
-  const pairingOpts = pairingCandidates
-    .map(f => `<option value="${escHtml(f)}" ${f === pairing.family ? 'selected' : ''}>${escHtml(f)}</option>`)
-    .join('');
+  // Preload pairing-candidate fonts so they're ready when the dropdown opens
+  loadFontCSS(getPairingsByFamily(primary.family));
 
   document.getElementById('step4-content').innerHTML = `
     <div class="step4-layout">
@@ -2621,15 +3718,11 @@ function renderTypeSystem(primary, pairing) {
           </div>
           <div class="ctrl-group">
             <span class="ctrl-label">Primary</span>
-            <select class="font-select-pill" id="sel-primary" onchange="swapPrimaryFont()">
-              ${primaryOpts}
-            </select>
+            <div class="fp-select" id="fp-primary"></div>
           </div>
           <div class="ctrl-group">
             <span class="ctrl-label">Pairing</span>
-            <select class="font-select-pill" id="sel-pairing" onchange="swapPairingFont()">
-              ${pairingOpts}
-            </select>
+            <div class="fp-select" id="fp-pairing"></div>
           </div>
           <div class="ctrl-group">
             <div class="size-wrap">
@@ -2645,7 +3738,7 @@ function renderTypeSystem(primary, pairing) {
       <div class="preview-section">
         <div class="preview-meta-row">
           <span class="preview-meta-lbl" id="lbl-display">BRAND NAME — DISPLAY · ${sp.toUpperCase()}</span>
-          <span class="preview-meta-lbl" id="sz-display">56PX</span>
+          <span class="preview-meta-lbl scrubbable" id="sz-display" data-target="prev-display" data-min="12" data-max="160" title="Drag up/down to resize">56PX</span>
         </div>
         <div class="preview-editable prev-display" id="prev-display"
              style="font-family:'${sp}',serif;"
@@ -2655,7 +3748,7 @@ function renderTypeSystem(primary, pairing) {
       <div class="preview-section">
         <div class="preview-meta-row">
           <span class="preview-meta-lbl" id="lbl-heading">TAGLINE — HEADING · ${sp.toUpperCase()}</span>
-          <span class="preview-meta-lbl" id="sz-heading">32PX</span>
+          <span class="preview-meta-lbl scrubbable" id="sz-heading" data-target="prev-heading" data-min="12" data-max="120" title="Drag up/down to resize">40PX</span>
         </div>
         <div class="preview-editable prev-heading" id="prev-heading"
              style="font-family:'${sp}',serif;"
@@ -2665,7 +3758,7 @@ function renderTypeSystem(primary, pairing) {
       <div class="preview-section">
         <div class="preview-meta-row">
           <span class="preview-meta-lbl" id="lbl-body">PARAGRAPH — BODY · ${ss.toUpperCase()}</span>
-          <span class="preview-meta-lbl" id="sz-body">16PX</span>
+          <span class="preview-meta-lbl scrubbable" id="sz-body" data-target="prev-body" data-min="10" data-max="40" title="Drag up/down to resize">16PX</span>
         </div>
         <div class="preview-editable prev-body" id="prev-body"
              style="font-family:'${ss}',sans-serif;"
@@ -2674,7 +3767,7 @@ function renderTypeSystem(primary, pairing) {
       <div class="preview-section">
         <div class="preview-meta-row">
           <span class="preview-meta-lbl" id="lbl-caption">CAPTION · ${ss.toUpperCase()}</span>
-          <span class="preview-meta-lbl" id="sz-caption">12PX</span>
+          <span class="preview-meta-lbl scrubbable" id="sz-caption" data-target="prev-caption" data-min="8" data-max="24" title="Drag up/down to resize">12PX</span>
         </div>
         <div class="preview-editable prev-caption" id="prev-caption"
              style="font-family:'${ss}',sans-serif;"
@@ -2688,6 +3781,71 @@ function renderTypeSystem(primary, pairing) {
       <button class="btn-primary" onclick="advanceToStep5()">Continue to export →</button>
     </div>
   `;
+
+  // Initialize custom font pickers (with previews) for both primary and pairing
+  const primaryFontList = allFonts.slice().sort((a, b) => a.family.localeCompare(b.family));
+  setupFontPicker('fp-primary', {
+    fonts:       primaryFontList,
+    value:       primary.family,
+    searchable:  true,
+    onChange:    swapPrimaryFont,
+    onPreview:   previewPrimaryFont,
+  });
+  setupFontPicker('fp-pairing', {
+    fonts:       getPairingsByFamily(primary.family).map(name => ({
+                   family: name,
+                   category: lookupCategory(name),
+                 })),
+    value:       pairing.family,
+    searchable:  false,
+    onChange:    swapPairingFont,
+    onPreview:   previewPairingFont,
+  });
+
+  // Wire up Figma-style drag scrubbers on each size label
+  document.querySelectorAll('.scrubbable').forEach(attachScrubber);
+}
+
+// Drag-to-resize: vertical mouse motion adjusts the linked preview's font-size.
+// Drag up = bigger, drag down = smaller. ~0.4px per pixel of mouse travel.
+function attachScrubber(label) {
+  const targetId = label.dataset.target;
+  const minSize  = parseInt(label.dataset.min, 10);
+  const maxSize  = parseInt(label.dataset.max, 10);
+  const target   = document.getElementById(targetId);
+  if (!target) return;
+
+  let isDragging = false;
+  let startY     = 0;
+  let startSize  = 0;
+
+  label.addEventListener('mousedown', e => {
+    e.preventDefault();
+    isDragging = true;
+    startY     = e.clientY;
+    // Get the actual rendered size (or parse from label as a fallback)
+    const cs = window.getComputedStyle(target).fontSize;
+    startSize = parseFloat(cs) || parseFloat(label.textContent);
+    label.classList.add('dragging');
+    document.body.classList.add('is-scrubbing');
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    // Up = increase. deltaY is positive when moving up.
+    const deltaY  = startY - e.clientY;
+    const sens    = e.shiftKey ? 1.0 : 0.4; // hold Shift for faster scrub
+    const newSize = Math.max(minSize, Math.min(maxSize, Math.round(startSize + deltaY * sens)));
+    target.style.fontSize = newSize + 'px';
+    label.textContent     = newSize + 'PX';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    label.classList.remove('dragging');
+    document.body.classList.remove('is-scrubbing');
+  });
 }
 
 // ── Step 4 helper functions ───────────────────────────────────
@@ -2703,7 +3861,7 @@ function setPreviewTheme(btn, theme) {
 function updateBaseSize(val) {
   const base    = +val;
   const display = Math.round(base * 3.5);
-  const heading = Math.round(base * 2);
+  const heading = Math.round(base * 2.5);
   const caption = Math.max(10, Math.round(base * 0.75));
   document.getElementById('size-label').textContent      = `Base: ${base}px`;
   document.getElementById('sz-display').textContent      = `${display}PX`;
@@ -2717,22 +3875,27 @@ function updateBaseSize(val) {
 }
 
 function swapPrimaryFont() {
-  const primary = document.getElementById('sel-primary').value;
+  const primary    = getFontPickerValue('fp-primary');
+  const primaryFb  = categoryFallback(lookupCategory(primary));
 
-  // Rebuild pairing dropdown with new primary's suggested pairings
+  // Rebuild pairing picker with new primary's suggested pairings
   const newPairings = getPairingsByFamily(primary);
-  const pairingSel  = document.getElementById('sel-pairing');
-  pairingSel.innerHTML = newPairings
-    .map(f => `<option value="${escHtml(f)}">${escHtml(f)}</option>`)
-    .join('');
+  setupFontPicker('fp-pairing', {
+    fonts:       newPairings.map(name => ({ family: name, category: lookupCategory(name) })),
+    value:       newPairings[0],
+    searchable:  false,
+    onChange:    swapPairingFont,
+    onPreview:   previewPairingFont,
+  });
 
-  const pairing = pairingSel.value;
-  loadFontCSS([primary, pairing]);
+  const pairing   = newPairings[0];
+  const pairingFb = categoryFallback(lookupCategory(pairing));
+  loadFontCSS([primary, ...newPairings]);
 
-  document.getElementById('prev-display').style.fontFamily  = `'${primary}', serif`;
-  document.getElementById('prev-heading').style.fontFamily  = `'${primary}', serif`;
-  document.getElementById('prev-body').style.fontFamily     = `'${pairing}', sans-serif`;
-  document.getElementById('prev-caption').style.fontFamily  = `'${pairing}', sans-serif`;
+  document.getElementById('prev-display').style.fontFamily  = `'${primary}', ${primaryFb}`;
+  document.getElementById('prev-heading').style.fontFamily  = `'${primary}', ${primaryFb}`;
+  document.getElementById('prev-body').style.fontFamily     = `'${pairing}', ${pairingFb}`;
+  document.getElementById('prev-caption').style.fontFamily  = `'${pairing}', ${pairingFb}`;
 
   document.getElementById('lbl-display').textContent = `BRAND NAME — DISPLAY · ${primary.toUpperCase()}`;
   document.getElementById('lbl-heading').textContent = `TAGLINE — HEADING · ${primary.toUpperCase()}`;
@@ -2741,18 +3904,292 @@ function swapPrimaryFont() {
 }
 
 function swapPairingFont() {
-  const primary = document.getElementById('sel-primary').value;
-  const pairing = document.getElementById('sel-pairing').value;
+  const primary   = getFontPickerValue('fp-primary');
+  const pairing   = getFontPickerValue('fp-pairing');
+  const pairingFb = categoryFallback(lookupCategory(pairing));
   loadFontCSS([primary, pairing]);
-  document.getElementById('prev-body').style.fontFamily    = `'${pairing}', sans-serif`;
-  document.getElementById('prev-caption').style.fontFamily = `'${pairing}', sans-serif`;
+
+  document.getElementById('prev-body').style.fontFamily    = `'${pairing}', ${pairingFb}`;
+  document.getElementById('prev-caption').style.fontFamily = `'${pairing}', ${pairingFb}`;
   document.getElementById('lbl-body').textContent    = `PARAGRAPH — BODY · ${pairing.toUpperCase()}`;
   document.getElementById('lbl-caption').textContent = `CAPTION · ${pairing.toUpperCase()}`;
 }
 
+// Live preview helpers — applied as user browses/hovers options (not committed).
+// They mirror the relevant parts of swapPrimaryFont/swapPairingFont but skip the dropdown rebuilds.
+
+function previewPrimaryFont(family) {
+  loadFontCSS([family]);
+  const fb = categoryFallback(lookupCategory(family));
+  const disp = document.getElementById('prev-display');
+  const head = document.getElementById('prev-heading');
+  const lblD = document.getElementById('lbl-display');
+  const lblH = document.getElementById('lbl-heading');
+  if (disp) disp.style.fontFamily = `'${family}', ${fb}`;
+  if (head) head.style.fontFamily = `'${family}', ${fb}`;
+  if (lblD) lblD.textContent = `BRAND NAME — DISPLAY · ${family.toUpperCase()}`;
+  if (lblH) lblH.textContent = `TAGLINE — HEADING · ${family.toUpperCase()}`;
+}
+
+function previewPairingFont(family) {
+  loadFontCSS([family]);
+  const fb = categoryFallback(lookupCategory(family));
+  const body = document.getElementById('prev-body');
+  const cap  = document.getElementById('prev-caption');
+  const lblB = document.getElementById('lbl-body');
+  const lblC = document.getElementById('lbl-caption');
+  if (body) body.style.fontFamily = `'${family}', ${fb}`;
+  if (cap)  cap.style.fontFamily  = `'${family}', ${fb}`;
+  if (lblB) lblB.textContent = `PARAGRAPH — BODY · ${family.toUpperCase()}`;
+  if (lblC) lblC.textContent = `CAPTION · ${family.toUpperCase()}`;
+}
+
+// ── Custom font picker with per-option font previews ──────────
+
+// Read the currently-selected family from a picker by container id
+function getFontPickerValue(containerId) {
+  return document.getElementById(containerId).dataset.value;
+}
+
+/**
+ * Initialize a custom font-picker dropdown inside the given container.
+ *
+ * opts.fonts:      array of { family, category }
+ * opts.value:      currently-selected family
+ * opts.searchable: show a search input at top
+ * opts.onChange:   callback when user picks a different font
+ */
+function setupFontPicker(containerId, opts) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.classList.add('fp-select');
+  container.dataset.value = opts.value;
+
+  const safeValue = escHtml(opts.value);
+  const fb        = categoryFallback(lookupCategory(opts.value));
+
+  container.innerHTML = `
+    <button type="button" class="fp-trigger" style="font-family:'${safeValue}',${fb};">${safeValue}</button>
+    <div class="fp-menu">
+      ${opts.searchable ? `<input type="text" class="fp-search" placeholder="Search fonts…">` : ''}
+      <div class="fp-list"></div>
+    </div>
+  `;
+
+  const trigger = container.querySelector('.fp-trigger');
+  const menu    = container.querySelector('.fp-menu');
+  const list    = container.querySelector('.fp-list');
+  const search  = container.querySelector('.fp-search');
+
+  let observer = null;
+  let openState = false;
+  let highlightedIdx = -1;
+
+  function renderList(filter = '') {
+    const q = filter.toLowerCase();
+    const visible = q
+      ? opts.fonts.filter(f => f.family.toLowerCase().includes(q))
+      : opts.fonts;
+
+    if (!visible.length) {
+      list.innerHTML = `<div class="fp-empty">No fonts match "${escHtml(filter)}"</div>`;
+      highlightedIdx = -1;
+      return;
+    }
+
+    list.innerHTML = visible.map(f => {
+      const fbf = categoryFallback(f.category);
+      const safeFam = escHtml(f.family);
+      const isSelected = f.family === container.dataset.value ? 'selected' : '';
+      return `<div class="fp-option ${isSelected}" data-family="${safeFam}" style="font-family:'${safeFam}',${fbf};">${safeFam}</div>`;
+    }).join('');
+
+    // Lazy-load fonts as options scroll into view
+    if (observer) observer.disconnect();
+    observer = new IntersectionObserver(entries => {
+      const toLoad = [];
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          toLoad.push(e.target.dataset.family);
+          observer.unobserve(e.target);
+        }
+      });
+      if (toLoad.length) loadFontCSS(toLoad);
+    }, { root: list, rootMargin: '200px' });
+
+    list.querySelectorAll('.fp-option').forEach(opt => observer.observe(opt));
+    highlightedIdx = -1;
+  }
+
+  function getOptions() {
+    return list.querySelectorAll('.fp-option');
+  }
+
+  function setHighlight(idx, { preview = true, scroll = true } = {}) {
+    const options = getOptions();
+    if (!options.length) return;
+    if (idx < 0) idx = 0;
+    if (idx >= options.length) idx = options.length - 1;
+    options.forEach(o => o.classList.remove('highlighted'));
+    const target = options[idx];
+    target.classList.add('highlighted');
+    if (scroll) target.scrollIntoView({ block: 'nearest' });
+    highlightedIdx = idx;
+    if (preview && opts.onPreview) opts.onPreview(target.dataset.family);
+  }
+
+  function open() {
+    if (openState) return;
+    openState = true;
+    // Close any other open pickers
+    document.querySelectorAll('.fp-select.open').forEach(s => {
+      if (s !== container) s.classList.remove('open');
+    });
+    container.classList.add('open');
+    if (search) search.value = '';
+    renderList('');
+    if (search) setTimeout(() => search.focus(), 0);
+    // Highlight (and preview) the currently-selected option
+    const options = getOptions();
+    const selectedIdx = Array.from(options).findIndex(o => o.dataset.family === container.dataset.value);
+    if (selectedIdx >= 0) setHighlight(selectedIdx, { preview: false, scroll: true });
+  }
+
+  function close({ revertPreview = true } = {}) {
+    if (!openState) return;
+    openState = false;
+    container.classList.remove('open');
+    if (observer) { observer.disconnect(); observer = null; }
+    // Revert preview to the committed value (so hover/arrow-browsed states don't stick)
+    if (revertPreview && opts.onPreview) opts.onPreview(container.dataset.value);
+  }
+
+  function select(family) {
+    container.dataset.value = family;
+    const newFb = categoryFallback(lookupCategory(family));
+    trigger.textContent = family;
+    trigger.style.fontFamily = `'${family}', ${newFb}`;
+    close({ revertPreview: false }); // onChange will handle committed preview
+    if (opts.onChange) opts.onChange();
+  }
+
+  trigger.addEventListener('click', e => {
+    e.stopPropagation();
+    openState ? close() : open();
+  });
+
+  list.addEventListener('click', e => {
+    const opt = e.target.closest('.fp-option');
+    if (!opt) return;
+    select(opt.dataset.family);
+  });
+
+  // Mouse hover: highlight + preview
+  list.addEventListener('mouseover', e => {
+    const opt = e.target.closest('.fp-option');
+    if (!opt) return;
+    const options = Array.from(getOptions());
+    setHighlight(options.indexOf(opt), { scroll: false });
+  });
+
+  // Keyboard navigation — works while open whether search has focus or not
+  container.addEventListener('keydown', e => {
+    if (!openState) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlight(highlightedIdx < 0 ? 0 : highlightedIdx + 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlight(highlightedIdx < 0 ? 0 : highlightedIdx - 1);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const options = getOptions();
+      const target = options[highlightedIdx >= 0 ? highlightedIdx : 0];
+      if (target) select(target.dataset.family);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      close();
+    }
+  });
+
+  if (search) {
+    search.addEventListener('input', () => {
+      renderList(search.value);
+      const options = getOptions();
+      if (options.length) setHighlight(0, { preview: true, scroll: false });
+    });
+  }
+}
+
+// Global: close any open picker on click outside, or on Escape (and revert any in-progress preview)
+if (!window._fpGlobalClose) {
+  window._fpGlobalClose = true;
+
+  function closeOpenPickers() {
+    document.querySelectorAll('.fp-select.open').forEach(container => {
+      container.classList.remove('open');
+      // Revert the relevant preview to whatever was committed
+      const id = container.id;
+      const committed = container.dataset.value;
+      if (committed) {
+        if (id === 'fp-primary') previewPrimaryFont(committed);
+        if (id === 'fp-pairing') previewPairingFont(committed);
+      }
+    });
+  }
+
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.fp-select.open').forEach(s => {
+      if (!s.contains(e.target)) {
+        s.classList.remove('open');
+        const id = s.id;
+        const committed = s.dataset.value;
+        if (committed) {
+          if (id === 'fp-primary') previewPrimaryFont(committed);
+          if (id === 'fp-pairing') previewPairingFont(committed);
+        }
+      }
+    });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeOpenPickers();
+  });
+}
+
 function advanceToStep5() {
+  // Capture whatever sizes the user finalized on step 4 (slider + individual scrubbers)
+  state.userSizes = {
+    display: readPreviewSize('prev-display', 56),
+    heading: readPreviewSize('prev-heading', 32),
+    body:    readPreviewSize('prev-body',    16),
+    caption: readPreviewSize('prev-caption', 12),
+  };
   renderStep5(state.primaryFont, state.pairingFont);
   goToStep(5);
+}
+
+function readPreviewSize(id, fallback) {
+  const el = document.getElementById(id);
+  if (!el) return fallback;
+  const px = parseFloat(window.getComputedStyle(el).fontSize);
+  return Number.isFinite(px) ? Math.round(px) : fallback;
+}
+
+// Step 4 has 4 anchor sizes (Display, Heading, Body, Caption).
+// Step 5 needs 9 sizes — Step 4's "Heading" maps to H1; H2 and H3 step down proportionally.
+// Body Large/Small derive from Body, and Label derives from Caption.
+function deriveScaleSizes(u) {
+  const display = u.display;
+  const h1      = u.heading;
+  const h2      = Math.max(u.body + 1, Math.round(h1 * 0.8));
+  const h3      = Math.max(u.body + 1, Math.round(h1 * 0.6));
+  const body    = u.body;
+  const bodyLg  = Math.max(body + 1, Math.round(body * 1.125));
+  const bodySm  = Math.max(u.caption + 1, Math.round(body * 0.875));
+  const caption = u.caption;
+  const label   = Math.max(8, caption - 1);
+  return { display, h1, h2, h3, bodyLg, body, bodySm, caption, label };
 }
 
 // ================================================================
@@ -2769,16 +4206,19 @@ function renderStep5(primary, pairing) {
 
   loadFontCSS([primary.family, pairing.family]);
 
+  // Derive the 9-step scale from the 4 anchors the user set in step 4
+  const derived = deriveScaleSizes(state.userSizes);
+
   const SCALE = [
-    { role: 'Display',    size: 56, weight: 700, font: primary,  sample: sp,                                                              useCase: 'Hero titles, brand statements' },
-    { role: 'Heading 1',  size: 40, weight: 700, font: primary,  sample: 'The Art of Typography',                                         useCase: 'Page headings, article titles' },
-    { role: 'Heading 2',  size: 32, weight: 600, font: primary,  sample: 'Building visual hierarchy',                                     useCase: 'Section headings' },
-    { role: 'Heading 3',  size: 24, weight: 600, font: primary,  sample: 'A well-chosen typeface matters',                                useCase: 'Card titles, feature headings' },
-    { role: 'Body Large', size: 18, weight: 400, font: pairing,  sample: 'Typography is the art of arranging type.',                      useCase: 'Lead paragraphs, introductions' },
-    { role: 'Body',       size: 16, weight: 400, font: pairing,  sample: 'The right typeface creates a visual language that feels inevitable.', useCase: 'Main body copy' },
-    { role: 'Body Small', size: 14, weight: 400, font: pairing,  sample: 'Good typography goes largely unnoticed — it simply works.',     useCase: 'Secondary copy, supporting text' },
-    { role: 'Caption',    size: 12, weight: 400, font: pairing,  sample: 'Fig. 1 — A typeface is a design for a set of characters.',      useCase: 'Image captions, footnotes' },
-    { role: 'Label',      size: 11, weight: 600, font: pairing,  sample: 'CATEGORY · LABEL · TAG',                                        useCase: 'UI labels, tags, badges' },
+    { role: 'Display',    size: derived.display,    weight: 700, font: primary,  sample: sp,                                                              useCase: 'Hero titles, brand statements' },
+    { role: 'Heading 1',  size: derived.h1,         weight: 700, font: primary,  sample: 'The Art of Typography',                                         useCase: 'Page headings, article titles' },
+    { role: 'Heading 2',  size: derived.h2,         weight: 600, font: primary,  sample: 'Building visual hierarchy',                                     useCase: 'Section headings' },
+    { role: 'Heading 3',  size: derived.h3,         weight: 600, font: primary,  sample: 'A well-chosen typeface matters',                                useCase: 'Card titles, feature headings' },
+    { role: 'Body Large', size: derived.bodyLg,     weight: 400, font: pairing,  sample: 'Typography is the art of arranging type.',                      useCase: 'Lead paragraphs, introductions' },
+    { role: 'Body',       size: derived.body,       weight: 400, font: pairing,  sample: 'The right typeface creates a visual language that feels inevitable.', useCase: 'Main body copy' },
+    { role: 'Body Small', size: derived.bodySm,     weight: 400, font: pairing,  sample: 'Good typography goes largely unnoticed — it simply works.',     useCase: 'Secondary copy, supporting text' },
+    { role: 'Caption',    size: derived.caption,    weight: 400, font: pairing,  sample: 'Fig. 1 — A typeface is a design for a set of characters.',      useCase: 'Image captions, footnotes' },
+    { role: 'Label',      size: derived.label,      weight: 600, font: pairing,  sample: 'CATEGORY · LABEL · TAG',                                        useCase: 'UI labels, tags, badges' },
   ];
 
   const weightLabel = w => w === 700 ? 'Bold' : w === 600 ? 'Semibold' : 'Regular';
@@ -2910,6 +4350,11 @@ function buildCSS() {
   const importP = p.replace(/\s+/g, '+');
   const importS = s.replace(/\s+/g, '+');
 
+  // Use the user's finalized sizes from step 4 to derive the full scale
+  const d = deriveScaleSizes(state.userSizes);
+  const toRem = px => `${(px / 16).toFixed(4).replace(/\.?0+$/, '')}rem`;
+  const sizeLine = (name, px, width) => `--${name.padEnd(width)} ${toRem(px).padEnd(9)} /* ${px}px */`;
+
   return `/* Type System — ${p} + ${s} */
 
 @import url('https://fonts.googleapis.com/css2?family=${importP}:wght@400;600;700&family=${importS}:wght@400;600;700&display=swap');
@@ -2919,16 +4364,16 @@ function buildCSS() {
   --font-primary: '${p}', ${primaryFb};
   --font-pairing: '${s}', ${pairingFb};
 
-  /* Font sizes */
-  --text-display:    3.5rem;   /* 56px */
-  --text-heading-1:  2.5rem;   /* 40px */
-  --text-heading-2:  2rem;     /* 32px */
-  --text-heading-3:  1.5rem;   /* 24px */
-  --text-body-lg:    1.125rem; /* 18px */
-  --text-body:       1rem;     /* 16px */
-  --text-body-sm:    0.875rem; /* 14px */
-  --text-caption:    0.75rem;  /* 12px */
-  --text-label:      0.6875rem;/* 11px */
+  /* Font sizes — derived from your step 4 selections */
+  ${sizeLine('text-display:',   d.display, 17)}
+  ${sizeLine('text-heading-1:', d.h1,      17)}
+  ${sizeLine('text-heading-2:', d.h2,      17)}
+  ${sizeLine('text-heading-3:', d.h3,      17)}
+  ${sizeLine('text-body-lg:',   d.bodyLg,  17)}
+  ${sizeLine('text-body:',      d.body,    17)}
+  ${sizeLine('text-body-sm:',   d.bodySm,  17)}
+  ${sizeLine('text-caption:',   d.caption, 17)}
+  ${sizeLine('text-label:',     d.label,   17)}
 
   /* Font weights */
   --weight-regular:  400;
