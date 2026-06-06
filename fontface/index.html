@@ -12,18 +12,18 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:             #f5f3ef;
-      --surface:        #ffffff;
-      --surface-2:      #eeece8;
-      --border:         #dedad3;
-      --text:           #1c1b19;
-      --text-muted:     #7a7570;
-      --accent:         #2b3055;
-      --accent-hover:   #3c4475;
+      --bg:             #f4f5f7;   /* clean neutral light gray */
+      --surface:        #ffffff;   /* pure white cards */
+      --surface-2:      #f3f4f7;   /* clean light gray for tints and hovers */
+      --border:         #e4e7ec;   /* crisp modern border */
+      --text:           #14171e;   /* clean near-black */
+      --text-muted:     #6b7280;   /* clean cool gray */
+      --accent:         #2b3055;   /* navy — kept the same */
+      --accent-hover:   #3c4475;   /* navy hover — kept the same */
       --step-active-bg: #2b3055;
       --step-done-bg:   #8097b5;
-      --step-future-bg: #c8c4bc;
-      --tag-bg:         #e6e3dd;
+      --step-future-bg: #d1d5db;
+      --tag-bg:         #eef1f5;
       --radius:         7px;
       --radius-lg:      11px;
     }
@@ -595,12 +595,17 @@
 
     .ai-hero-title {
       font-family: 'Inter', sans-serif;
-      font-size: 48px;
+      font-size: 60px;
       font-weight: 700;
-      letter-spacing: -1.6px;
+      letter-spacing: -2px;
       line-height: 1.1;
       color: var(--text);
       margin-bottom: 14px;
+    }
+
+    .ai-hero-title .ai-hero-prefix {
+      font-size: 0.78em;
+      letter-spacing: -1.2px;
     }
 
     .ai-hero-title em {
@@ -609,7 +614,24 @@
       font-weight: 500;
       letter-spacing: -1px;
       color: var(--accent);
+      margin-left: 4px;
+    }
+
+    .ai-hero-title .ai-caret {
+      display: inline-block;
+      width: 3px;
+      height: 0.72em;
+      background: var(--accent);
       margin-left: 6px;
+      vertical-align: baseline;
+      border-radius: 1px;
+      transform: skewX(-12deg);
+      transform-origin: bottom center;
+      animation: caret-blink 1.05s steps(2, start) infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ai-hero-title .ai-caret { animation: none; }
     }
 
     .ai-hero-sub {
@@ -800,6 +822,87 @@
       background: var(--surface-2);
       color: var(--text);
       border-color: var(--text-muted);
+    }
+
+    /* + button popover menu */
+    .ai-attach-wrapper {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .ai-attach-menu {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 0;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      padding: 6px;
+      z-index: 100;
+      min-width: 270px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .ai-attach-menu[hidden] { display: none; }
+
+    .ai-attach-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.13s;
+    }
+
+    .ai-attach-option:not(.ai-attach-hint):hover {
+      background: var(--surface-2);
+    }
+
+    .ai-attach-hint {
+      cursor: default;
+    }
+
+    .opt-icon {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--surface-2);
+      color: var(--text);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .opt-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .opt-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .opt-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.3;
     }
 
     .ai-send {
@@ -1951,13 +2054,19 @@
 
     .scale-chart {
       margin-bottom: 36px;
-      border-top: 1px solid var(--border);
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
     }
+
+    /* Remove the bottom border on the last row so it doesn't double up with the frame */
+    .scale-row:last-child { border-bottom: none; }
 
     .scale-header,
     .scale-row {
       display: grid;
-      grid-template-columns: 1fr 110px 70px 95px 175px 165px;
+      grid-template-columns: 1fr 110px 100px 110px 145px 145px 40px;
       border-bottom: 1px solid var(--border);
       align-items: stretch;
     }
@@ -1975,12 +2084,15 @@
     }
 
     .scale-preview-col {
-      padding: 16px 18px 16px 0;
+      padding: 16px 18px 16px 28px;
       background: transparent;
       display: flex;
       align-items: center;
       overflow: hidden;
     }
+
+    /* Match the header's first column padding so it lines up with the preview cells */
+    .scale-header > .scale-th:first-child { padding-left: 28px; }
 
     .scale-preview-text {
       overflow: hidden;
@@ -1998,6 +2110,129 @@
       display: flex;
       align-items: center;
       font-variant-numeric: tabular-nums;
+    }
+
+    /* Editable cell styling — inline, minimal chrome */
+    .scale-cell-edit {
+      display: inline-block;
+      min-width: 24px;
+      padding: 3px 6px;
+      margin: -3px -6px;
+      border-radius: 4px;
+      transition: background 0.13s, box-shadow 0.13s;
+      outline: none;
+      cursor: text;
+    }
+
+    .scale-cell-edit:hover { background: var(--surface-2); }
+    .scale-cell-edit:focus {
+      background: var(--surface);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .scale-cell-input,
+    .scale-cell-select {
+      width: 100%;
+      padding: 5px 8px;
+      margin: -5px -8px;
+      border: 1.5px solid transparent;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: inherit;
+      border-radius: 5px;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.13s, border-color 0.13s;
+      appearance: none;
+      -webkit-appearance: none;
+      min-width: 0;
+    }
+
+    .scale-cell-input {
+      font-variant-numeric: tabular-nums;
+      cursor: text;
+      padding-right: 4px;       /* extra room for the spinner buttons */
+    }
+
+    /* Make the native number-input spinner buttons less aggressive */
+    .scale-cell-input::-webkit-outer-spin-button,
+    .scale-cell-input::-webkit-inner-spin-button {
+      margin-left: 4px;
+      opacity: 0.5;
+    }
+
+    .scale-cell-input:hover,
+    .scale-cell-select:hover {
+      background: var(--surface-2);
+    }
+
+    .scale-cell-input:focus,
+    .scale-cell-select:focus {
+      background: var(--surface);
+      border-color: var(--accent);
+    }
+
+    .scale-cell-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' fill='none'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%237a7570' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      padding-right: 22px;
+    }
+
+    /* Action column (delete button on row hover) */
+    .scale-action-col {
+      padding: 0;
+      justify-content: center;
+    }
+
+    .scale-delete-row {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      opacity: 0;
+      transition: opacity 0.13s, background 0.13s, color 0.13s;
+    }
+
+    .scale-row:hover .scale-delete-row { opacity: 1; }
+
+    .scale-delete-row:hover {
+      background: #fdf0ef;
+      color: #c0392b;
+    }
+
+    /* Add-row button at the bottom of the chart */
+    .scale-add-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 16px;
+      background: none;
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-lg);
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 36px;
+      margin-top: -28px;
+      transition: border-color 0.13s, color 0.13s, background 0.13s;
+    }
+
+    .scale-add-row:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--surface);
     }
 
     /* ── EXPORT BUTTONS + MODAL ──────────────────────────────── */
@@ -2148,8 +2383,8 @@
     <section class="ai-section" id="ai-section">
       <div class="ai-hero">
         <div class="ai-hero-icon">✦</div>
-        <h2 class="ai-hero-title">Find your <em>fonts</em></h2>
-        <p class="ai-hero-sub">Describe your brand or vibe, drop in moodboard images — or both. Gemini will suggest fonts that match.</p>
+        <h2 class="ai-hero-title"><span class="ai-hero-prefix">Find your</span> <em>font</em><span class="ai-caret" aria-hidden="true"></span></h2>
+        <p class="ai-hero-sub">Describe your brand or vibe, drop in moodboard images — or both. We'll match fonts to your project.</p>
       </div>
 
       <form class="ai-chat-card" id="ai-chat-card" onsubmit="event.preventDefault(); submitAI();">
@@ -2161,9 +2396,36 @@
         <div id="ai-images-grid" hidden></div>
 
         <div class="ai-chat-actions">
-          <button type="button" class="ai-attach"
-                  onclick="document.getElementById('ai-file').click()"
-                  aria-label="Add image (or drop / paste)" title="Add image">+</button>
+          <div class="ai-attach-wrapper">
+            <button type="button" class="ai-attach"
+                    onclick="toggleAttachMenu(event)"
+                    aria-label="Add image options" title="Add image">+</button>
+
+            <div class="ai-attach-menu" id="ai-attach-menu" hidden>
+              <button type="button" class="ai-attach-option"
+                      onclick="document.getElementById('ai-file').click(); closeAttachMenu();">
+                <span class="opt-icon">↑</span>
+                <span class="opt-text">
+                  <span class="opt-title">Upload from device</span>
+                  <span class="opt-sub">Click to browse files</span>
+                </span>
+              </button>
+              <div class="ai-attach-option ai-attach-hint">
+                <span class="opt-icon">⌘</span>
+                <span class="opt-text">
+                  <span class="opt-title">Paste from clipboard</span>
+                  <span class="opt-sub">Press ⌘V anywhere on the page</span>
+                </span>
+              </div>
+              <div class="ai-attach-option ai-attach-hint">
+                <span class="opt-icon">↓</span>
+                <span class="opt-text">
+                  <span class="opt-title">Drag and drop</span>
+                  <span class="opt-sub">Drop images into the chat box</span>
+                </span>
+              </div>
+            </div>
+          </div>
 
           <div class="ai-submit-group">
             <button type="button" id="ai-stop" class="ai-stop" hidden onclick="abortAI()" aria-label="Stop analyzing" title="Stop">
@@ -2762,6 +3024,30 @@ function clearAIImage() {
   const fileInput = document.getElementById('ai-file');
   if (fileInput) fileInput.value = '';
 }
+
+// Toggle the + button popover menu with upload options
+function toggleAttachMenu(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('ai-attach-menu');
+  if (menu) menu.hidden = !menu.hidden;
+}
+
+function closeAttachMenu() {
+  const menu = document.getElementById('ai-attach-menu');
+  if (menu) menu.hidden = true;
+}
+
+// Close the attach menu when clicking outside it
+document.addEventListener('click', e => {
+  const menu = document.getElementById('ai-attach-menu');
+  if (!menu || menu.hidden) return;
+  if (!e.target.closest('.ai-attach-wrapper')) closeAttachMenu();
+});
+
+// Also close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeAttachMenu();
+});
 
 // Wire drop zone events once on page load
 (function setupAIDropZone() {
@@ -3892,6 +4178,12 @@ function swapPrimaryFont() {
   const pairingFb = categoryFallback(lookupCategory(pairing));
   loadFontCSS([primary, ...newPairings]);
 
+  // Commit the new selections to state so step 5 / export use them
+  const primaryFont = allFonts.find(f => f.family === primary) || { family: primary, category: lookupCategory(primary), variants: ['regular'] };
+  const pairingFont = allFonts.find(f => f.family === pairing) || { family: pairing, category: lookupCategory(pairing), variants: ['regular'] };
+  state.primaryFont = primaryFont;
+  state.pairingFont = pairingFont;
+
   document.getElementById('prev-display').style.fontFamily  = `'${primary}', ${primaryFb}`;
   document.getElementById('prev-heading').style.fontFamily  = `'${primary}', ${primaryFb}`;
   document.getElementById('prev-body').style.fontFamily     = `'${pairing}', ${pairingFb}`;
@@ -3908,6 +4200,10 @@ function swapPairingFont() {
   const pairing   = getFontPickerValue('fp-pairing');
   const pairingFb = categoryFallback(lookupCategory(pairing));
   loadFontCSS([primary, pairing]);
+
+  // Commit the new pairing to state so step 5 / export use it
+  const pairingFont = allFonts.find(f => f.family === pairing) || { family: pairing, category: lookupCategory(pairing), variants: ['regular'] };
+  state.pairingFont = pairingFont;
 
   document.getElementById('prev-body').style.fontFamily    = `'${pairing}', ${pairingFb}`;
   document.getElementById('prev-caption').style.fontFamily = `'${pairing}', ${pairingFb}`;
@@ -4197,6 +4493,9 @@ function deriveScaleSizes(u) {
 // ================================================================
 
 function renderStep5(primary, pairing) {
+  // Re-rendering Step 5 means a fresh chart — drop any pending undo history
+  scaleDeleteHistory = [];
+
   const sp     = escHtml(primary.family);
   const ss     = escHtml(pairing.family);
   const spCat  = CAT_LABELS[primary.category] || primary.category || '';
@@ -4221,8 +4520,6 @@ function renderStep5(primary, pairing) {
     { role: 'Label',      size: derived.label,      weight: 600, font: pairing,  sample: 'CATEGORY · LABEL · TAG',                                        useCase: 'UI labels, tags, badges' },
   ];
 
-  const weightLabel = w => w === 700 ? 'Bold' : w === 600 ? 'Semibold' : 'Regular';
-
   const header = `
     <div class="scale-header">
       <div class="scale-th">Preview</div>
@@ -4231,25 +4528,10 @@ function renderStep5(primary, pairing) {
       <div class="scale-th">Weight</div>
       <div class="scale-th">Typeface</div>
       <div class="scale-th">Use Case</div>
+      <div class="scale-th"></div>
     </div>`;
 
-  const rows = SCALE.map(s => {
-    const fam = escHtml(s.font.family);
-    return `
-      <div class="scale-row">
-        <div class="scale-preview-col">
-          <span class="scale-preview-text"
-                style="font-family:'${fam}',serif;font-size:${s.size}px;font-weight:${s.weight};line-height:1.2;">
-            ${s.sample}
-          </span>
-        </div>
-        <div class="scale-data-col">${s.role}</div>
-        <div class="scale-data-col">${s.size}px</div>
-        <div class="scale-data-col">${weightLabel(s.weight)}</div>
-        <div class="scale-data-col" style="font-family:'${fam}',serif;font-size:12px;">${fam}</div>
-        <div class="scale-data-col" style="color:var(--text-muted);font-size:12px;">${s.useCase}</div>
-      </div>`;
-  }).join('');
+  const rows = SCALE.map(s => renderScaleRow(s, primary, pairing)).join('');
 
   document.getElementById('step5-content').innerHTML = `
     <div id="export-target">
@@ -4270,8 +4552,10 @@ function renderStep5(primary, pairing) {
       </div>
 
       <div class="scale-section-label">Type scale</div>
-      <div class="scale-chart">${header}${rows}</div>
+      <div class="scale-chart" id="scale-chart">${header}${rows}</div>
     </div>
+
+    <button class="scale-add-row" onclick="addScaleRow()">＋ Add row</button>
 
     <div class="step3-actions" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:32px;">
       <button class="btn-secondary" onclick="goBack()">← Back to preview</button>
@@ -4281,6 +4565,211 @@ function renderStep5(primary, pairing) {
       </div>
     </div>
   `;
+}
+
+// ── Type scale chart editing ────────────────────────────────
+
+function weightLabel(w) {
+  const n = +w;
+  return n === 100 ? 'Thin'
+       : n === 200 ? 'ExtraLight'
+       : n === 300 ? 'Light'
+       : n === 400 ? 'Regular'
+       : n === 500 ? 'Medium'
+       : n === 600 ? 'Semibold'
+       : n === 700 ? 'Bold'
+       : n === 800 ? 'ExtraBold'
+       : n === 900 ? 'Black'
+       : String(n);
+}
+
+// Parse a font's variants array → unique sorted numeric weights
+function getWeightsForFont(font) {
+  const out = new Set();
+  (font?.variants || []).forEach(v => {
+    if (v === 'regular') out.add(400);
+    else if (v === 'italic') return;
+    else {
+      const n = parseInt(String(v).replace('italic', ''), 10);
+      if (!Number.isNaN(n)) out.add(n);
+    }
+  });
+  const arr = Array.from(out).sort((a, b) => a - b);
+  return arr.length ? arr : [400];
+}
+
+// Render a single editable row for the type scale chart
+function renderScaleRow(s, primary, pairing) {
+  const fam     = escHtml(s.font.family);
+  const weights = getWeightsForFont(s.font);
+  const weightOpts = weights.map(w =>
+    `<option value="${w}" ${w === +s.weight ? 'selected' : ''}>${weightLabel(w)}</option>`
+  ).join('');
+
+  const sp = escHtml(primary.family);
+  const ss = escHtml(pairing.family);
+  const fontOpts = `
+    <option value="${sp}" style="font-family:'${sp}',serif;"   ${s.font.family === primary.family ? 'selected' : ''}>${sp}</option>
+    <option value="${ss}" style="font-family:'${ss}',sans-serif;" ${s.font.family === pairing.family ? 'selected' : ''}>${ss}</option>
+  `;
+
+  return `
+    <div class="scale-row">
+      <div class="scale-preview-col">
+        <span class="scale-preview-text scale-cell-edit"
+              contenteditable="true" spellcheck="false"
+              data-preview
+              style="font-family:'${fam}',serif;font-size:${s.size}px;font-weight:${s.weight};line-height:1.2;">
+          ${escHtml(s.sample)}
+        </span>
+      </div>
+      <div class="scale-data-col">
+        <span class="scale-cell-edit" contenteditable="true" spellcheck="false" data-role>${escHtml(s.role)}</span>
+      </div>
+      <div class="scale-data-col">
+        <input type="number" class="scale-cell-input" data-size
+               value="${s.size}" min="6" max="240"
+               oninput="updateRowSize(this)">
+      </div>
+      <div class="scale-data-col">
+        <select class="scale-cell-select" data-weight onchange="updateRowWeight(this)">${weightOpts}</select>
+      </div>
+      <div class="scale-data-col" style="font-size:12px;">
+        <select class="scale-cell-select" data-font onchange="updateRowFont(this)"
+                style="font-family:'${fam}',serif;font-size:12px;">${fontOpts}</select>
+      </div>
+      <div class="scale-data-col" style="color:var(--text-muted);font-size:12px;">
+        <span class="scale-cell-edit" contenteditable="true" spellcheck="false" data-usecase>${escHtml(s.useCase)}</span>
+      </div>
+      <div class="scale-data-col scale-action-col">
+        <button class="scale-delete-row" onclick="deleteScaleRow(this)" aria-label="Delete row" title="Delete row">×</button>
+      </div>
+    </div>
+  `;
+}
+
+function updateRowSize(input) {
+  const row     = input.closest('.scale-row');
+  const preview = row.querySelector('[data-preview]');
+  const size    = Math.max(6, Math.min(240, +input.value || 16));
+  input.value   = size;
+  preview.style.fontSize = size + 'px';
+}
+
+function updateRowWeight(select) {
+  const row     = select.closest('.scale-row');
+  const preview = row.querySelector('[data-preview]');
+  preview.style.fontWeight = select.value;
+}
+
+function updateRowFont(select) {
+  const row     = select.closest('.scale-row');
+  const preview = row.querySelector('[data-preview]');
+  const family  = select.value;
+  loadFontCSS([family]);
+
+  const fb = categoryFallback(lookupCategory(family));
+  preview.style.fontFamily = `'${family}', ${fb}`;
+  select.style.fontFamily  = `'${family}', ${fb}`;
+
+  // Rebuild the weight dropdown with this font's available variants
+  const font = allFonts.find(f => f.family === family);
+  if (font) {
+    const weightSel = row.querySelector('[data-weight]');
+    const currWeight = +weightSel.value;
+    const weights = getWeightsForFont(font);
+    // Snap to closest weight if current isn't available
+    const newWeight = weights.includes(currWeight)
+      ? currWeight
+      : weights.reduce((best, w) => Math.abs(w - currWeight) < Math.abs(best - currWeight) ? w : best);
+
+    weightSel.innerHTML = weights.map(w =>
+      `<option value="${w}" ${w === newWeight ? 'selected' : ''}>${weightLabel(w)}</option>`
+    ).join('');
+    preview.style.fontWeight = newWeight;
+  }
+}
+
+// History stack of deleted rows, so Cmd+Z / Ctrl+Z can restore them
+let scaleDeleteHistory = [];
+
+function deleteScaleRow(btn) {
+  const row = btn.closest('.scale-row');
+  if (!row) return;
+  const chart = document.getElementById('scale-chart');
+  if (!chart) return;
+
+  // Remember the row's position relative to other rows for restore
+  const allRows = Array.from(chart.querySelectorAll('.scale-row'));
+  const index   = allRows.indexOf(row);
+
+  scaleDeleteHistory.push({
+    html:  row.outerHTML,
+    index: index,
+  });
+
+  row.remove();
+}
+
+function undoScaleDelete() {
+  if (!scaleDeleteHistory.length) return false;
+  const chart = document.getElementById('scale-chart');
+  if (!chart) return false;
+
+  const last = scaleDeleteHistory.pop();
+  const rows = chart.querySelectorAll('.scale-row');
+
+  if (rows.length === 0 || last.index >= rows.length) {
+    // Restore at the end if original position no longer exists
+    chart.insertAdjacentHTML('beforeend', last.html);
+  } else {
+    rows[last.index].insertAdjacentHTML('beforebegin', last.html);
+  }
+  return true;
+}
+
+// Cmd+Z / Ctrl+Z restores the most recently deleted row — only when on Step 5
+// and the focused element isn't an editable field (so normal text undo still works there).
+document.addEventListener('keydown', e => {
+  if (currentStep !== 5) return;
+  if (!(e.key === 'z' || e.key === 'Z')) return;
+  if (!(e.metaKey || e.ctrlKey)) return;
+  if (e.shiftKey) return;   // Shift+Cmd+Z is "redo", leave it alone
+
+  // If user is editing a cell, let the browser handle native text undo first
+  const active = document.activeElement;
+  if (active && (
+        active.tagName === 'INPUT' ||
+        active.tagName === 'SELECT' ||
+        active.tagName === 'TEXTAREA' ||
+        active.isContentEditable)) {
+    return;
+  }
+
+  if (undoScaleDelete()) e.preventDefault();
+});
+
+function addScaleRow() {
+  const chart   = document.getElementById('scale-chart');
+  const primary = state.primaryFont;
+  const pairing = state.pairingFont;
+  if (!chart || !primary || !pairing) return;
+
+  const newRow = {
+    role:    'New Row',
+    size:    16,
+    weight:  400,
+    font:    primary,
+    sample:  'Edit this preview text',
+    useCase: 'Describe its purpose',
+  };
+
+  chart.insertAdjacentHTML('beforeend', renderScaleRow(newRow, primary, pairing));
+  // Scroll the new row into view
+  const lastRow = chart.lastElementChild;
+  if (lastRow && lastRow.scrollIntoView) {
+    lastRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 }
 
 // ================================================================
@@ -4305,7 +4794,7 @@ function exportPNG() {
     position: fixed;
     top: -10000px;
     left: 0;
-    background: #f5f3ef;
+    background: #f4f5f7;
     padding: 72px 80px;
     width: ${target.offsetWidth + 160}px;
     box-sizing: content-box;
@@ -4316,7 +4805,7 @@ function exportPNG() {
   document.body.appendChild(wrapper);
 
   html2canvas(wrapper, {
-    backgroundColor: '#f5f3ef',
+    backgroundColor: '#f4f5f7',
     scale: 2,
     useCORS: true,
     logging: false,
