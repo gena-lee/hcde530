@@ -392,28 +392,13 @@
     .app-shell {
       display: grid;
       grid-template-columns: 240px minmax(0, 780px);
-      grid-template-areas:
-        "ai   ai"
-        "side main";
       align-items: start;
-      gap: 0 28px;
+      gap: 28px;
       max-width: 1160px;
       margin: 0 auto;
       padding: 36px 80px 120px;
     }
 
-    #panel-1 > .ai-section {
-      grid-area: ai;
-      margin-bottom: 60px;
-      min-height: calc(100vh - 110px);   /* fill viewport so browse is below the fold */
-      display: flex;
-      flex-direction: column;
-    }
-    #panel-1 > .sidebar      { grid-area: side; }
-    #panel-1 > .results-area { grid-area: main; }
-
-    /* "Or browse all fonts ↓" lands the results header just below the sticky page header */
-    #browse-section { scroll-margin-top: 68px; }   /* 54px sticky header + 14px breathing room */
 
     /* ── SIDEBAR ─────────────────────────────────────────────── */
 
@@ -544,455 +529,6 @@
       min-width: 0;
     }
 
-    /* ── AI section — chat-style input ─────────────────────── */
-
-    .ai-section {
-      max-width: 720px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .ai-scroll-down {
-      display: block;
-      align-self: center;
-      margin-top: auto;              /* push to bottom of the ai-section flex column */
-      padding: 10px 20px;
-      background: none;
-      border: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-muted);
-      cursor: pointer;
-      text-align: center;
-      transition: color 0.15s;
-    }
-
-    .ai-scroll-down:hover { color: var(--accent); }
-
-    .ai-scroll-down .arrow {
-      display: inline-block;
-      margin-left: 6px;
-      transition: transform 0.2s;
-    }
-
-    .ai-scroll-down:hover .arrow {
-      transform: translateY(3px);
-    }
-
-    .ai-hero {
-      text-align: center;
-      padding-top: 48px;
-      margin-bottom: 30px;
-    }
-
-    .ai-hero-icon {
-      font-size: 26px;
-      margin-bottom: 18px;
-      display: inline-block;
-      color: var(--accent);
-    }
-
-    .ai-hero-title {
-      font-family: 'Inter', sans-serif;
-      font-size: 60px;
-      font-weight: 700;
-      letter-spacing: -2px;
-      line-height: 1.1;
-      color: var(--text);
-      margin-bottom: 14px;
-    }
-
-    .ai-hero-title .ai-hero-prefix {
-      font-size: 0.78em;
-      letter-spacing: -1.2px;
-    }
-
-    .ai-hero-title em {
-      font-family: 'EB Garamond', Georgia, serif;
-      font-style: italic;
-      font-weight: 500;
-      letter-spacing: -1px;
-      color: var(--accent);
-      margin-left: 4px;
-    }
-
-    .ai-hero-title .ai-caret {
-      display: inline-block;
-      width: 3px;
-      height: 0.72em;
-      background: var(--accent);
-      margin-left: 6px;
-      vertical-align: baseline;
-      border-radius: 1px;
-      transform: skewX(-12deg);
-      transform-origin: bottom center;
-      animation: caret-blink 1.05s steps(2, start) infinite;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .ai-hero-title .ai-caret { animation: none; }
-    }
-
-    .ai-hero-sub {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.5;
-      max-width: 440px;
-      margin: 0 auto;
-    }
-
-    .ai-chat-card {
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: 20px;
-      padding: 22px 22px 14px;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.03);
-      transition: border-color 0.15s, box-shadow 0.15s;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .ai-chat-card:focus-within {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(43,48,85,0.08);
-    }
-
-    .ai-chat-card.dragging {
-      border-color: var(--accent);
-      border-style: dashed;
-      background: var(--surface-2);
-    }
-
-    #ai-text {
-      width: 100%;
-      border: none;
-      background: transparent;
-      resize: none;
-      font-family: 'Inter', system-ui, sans-serif;
-      font-size: 15px;
-      line-height: 1.6;
-      color: var(--text);
-      padding: 4px 2px;
-      min-height: 56px;
-      max-height: 220px;
-      outline: none;
-      overflow-y: auto;
-    }
-
-    #ai-text::placeholder {
-      color: var(--text-muted);
-    }
-
-    #ai-images-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    #ai-images-grid[hidden] { display: none; }
-
-    .ai-image-tile {
-      position: relative;
-      width: 64px;
-      height: 64px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: var(--surface);
-    }
-
-    .ai-image-tile img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      cursor: zoom-in;
-    }
-
-    /* ── Image lightbox ──────────────────────────────────────── */
-
-    #image-lightbox {
-      position: fixed;
-      inset: 0;
-      background: rgba(20, 24, 41, 0.88);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      padding: 60px;
-      cursor: zoom-out;
-      animation: lightbox-fade 0.2s ease-out;
-    }
-
-    #image-lightbox[hidden] { display: none; }
-
-    @keyframes lightbox-fade {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    #image-lightbox img {
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 8px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
-      animation: lightbox-zoom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes lightbox-zoom {
-      from { transform: scale(0.92); opacity: 0; }
-      to   { transform: scale(1);    opacity: 1; }
-    }
-
-    .lightbox-close {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15);
-      border: none;
-      color: #fff;
-      font-size: 22px;
-      line-height: 1;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      transition: background 0.13s;
-    }
-
-    .lightbox-close:hover { background: rgba(255, 255, 255, 0.28); }
-
-    .ai-tile-remove {
-      position: absolute;
-      top: 3px;
-      right: 3px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      font-size: 12px;
-      line-height: 1;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      transition: background 0.13s;
-    }
-
-    .ai-tile-remove:hover { background: rgba(0,0,0,0.9); }
-
-    .ai-chat-actions {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 12px;
-      margin-top: 14px;
-      gap: 12px;
-    }
-
-    .ai-attach {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: transparent;
-      border: 1.5px solid var(--border);
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 18px;
-      line-height: 1;
-      font-weight: 400;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      flex-shrink: 0;
-      transition: background 0.13s, color 0.13s, border-color 0.13s;
-    }
-
-    .ai-attach:hover {
-      background: var(--surface-2);
-      color: var(--text);
-      border-color: var(--text-muted);
-    }
-
-    /* + button popover menu */
-    .ai-attach-wrapper {
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .ai-attach-menu {
-      position: absolute;
-      bottom: calc(100% + 10px);
-      left: 0;
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
-      padding: 6px;
-      z-index: 100;
-      min-width: 270px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .ai-attach-menu[hidden] { display: none; }
-
-    .ai-attach-option {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      text-align: left;
-      font-family: 'Inter', sans-serif;
-      transition: background 0.13s;
-    }
-
-    .ai-attach-option:not(.ai-attach-hint):hover {
-      background: var(--surface-2);
-    }
-
-    .ai-attach-hint {
-      cursor: default;
-    }
-
-    .opt-icon {
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      background: var(--surface-2);
-      color: var(--text);
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .opt-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-
-    .opt-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.2;
-    }
-
-    .opt-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.3;
-    }
-
-    .ai-send {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 100px;
-      padding: 10px 22px;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: background 0.15s, opacity 0.15s;
-    }
-
-    .ai-send:hover:not(:disabled) { background: var(--accent-hover); }
-    .ai-send:disabled { opacity: 0.55; cursor: not-allowed; }
-
-    .ai-submit-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .ai-stop {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      flex-shrink: 0;
-      transition: background 0.13s, color 0.13s, border-color 0.13s;
-    }
-
-    .ai-stop[hidden] { display: none; }
-
-    .ai-stop:hover {
-      background: var(--text);
-      color: #fff;
-      border-color: var(--text);
-    }
-
-    .ai-spinner {
-      width: 13px;
-      height: 13px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: ai-spin 0.7s linear infinite;
-    }
-
-    .ai-spinner[hidden] { display: none; }
-
-    @keyframes ai-spin { to { transform: rotate(360deg); } }
-
-    #ai-error {
-      font-size: 13px;
-      color: #c0392b;
-      background: #fdf0ef;
-      border: 1px solid #f5c6c2;
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      margin-top: 14px;
-      text-align: center;
-    }
-
-    .ai-results-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.9px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-      margin-top: 40px;
-      text-align: center;
-    }
-
-    /* AI results spans full content width even on the chat-card-sized panel */
-    #ai-results .font-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
 
     .results-header {
       display: flex;
@@ -2063,16 +1599,44 @@
     /* Remove the bottom border on the last row so it doesn't double up with the frame */
     .scale-row:last-child { border-bottom: none; }
 
+    .scale-chart {
+      --col-name:     110px;
+      --col-size:     85px;
+      --col-weight:   120px;
+      --col-typeface: 165px;
+      --col-usecase:  180px;
+    }
+
     .scale-header,
     .scale-row {
       display: grid;
-      grid-template-columns: 1fr 110px 100px 110px 145px 145px 40px;
+      grid-template-columns: minmax(340px, 1fr) var(--col-name) var(--col-size) var(--col-weight) var(--col-typeface) var(--col-usecase) 40px;
       border-bottom: 1px solid var(--border);
       align-items: stretch;
     }
 
+    /* Drag-to-resize handle on header column edges */
+    .col-resize {
+      position: absolute;
+      top: 0;
+      right: -3px;
+      bottom: 0;
+      width: 6px;
+      cursor: col-resize;
+      z-index: 2;
+      background: transparent;
+      transition: background 0.13s;
+    }
+
+    .col-resize:hover,
+    .col-resize.resizing {
+      background: var(--accent);
+    }
+
+    body.col-resizing { cursor: col-resize; user-select: none; }
+
     .scale-th {
-      padding: 12px 18px;
+      padding: 12px 12px;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.4px;
@@ -2081,18 +1645,19 @@
       background: transparent;
       display: flex;
       align-items: center;
+      position: relative;
     }
 
     .scale-preview-col {
-      padding: 16px 18px 16px 28px;
+      padding: 16px 12px 16px 18px;
       background: transparent;
       display: flex;
       align-items: center;
       overflow: hidden;
     }
 
-    /* Match the header's first column padding so it lines up with the preview cells */
-    .scale-header > .scale-th:first-child { padding-left: 28px; }
+    .scale-header > .scale-th:first-child { padding-left: 18px; }
+
 
     .scale-preview-text {
       overflow: hidden;
@@ -2103,14 +1668,21 @@
     }
 
     .scale-data-col {
-      padding: 12px 18px;
+      padding: 12px 12px;
       font-size: 13px;
       color: var(--text);
       background: transparent;
       display: flex;
       align-items: center;
       font-variant-numeric: tabular-nums;
+      min-width: 0;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
+
+    /* Editable cells should also wrap rather than ellipsize */
+    .scale-data-col .scale-cell-edit { white-space: normal; word-break: break-word; }
 
     /* Editable cell styling — inline, minimal chrome */
     .scale-cell-edit {
@@ -2379,74 +1951,6 @@
   <!-- Step 1 -->
   <div class="app-shell step-panel active" id="panel-1">
 
-    <!-- AI section — full-width across the grid (top row) -->
-    <section class="ai-section" id="ai-section">
-      <div class="ai-hero">
-        <div class="ai-hero-icon">✦</div>
-        <h2 class="ai-hero-title"><span class="ai-hero-prefix">Find your</span> <em>font</em><span class="ai-caret" aria-hidden="true"></span></h2>
-        <p class="ai-hero-sub">Describe your brand or vibe, drop in moodboard images — or both. We'll match fonts to your project.</p>
-      </div>
-
-      <form class="ai-chat-card" id="ai-chat-card" onsubmit="event.preventDefault(); submitAI();">
-        <input type="file" id="ai-file" accept="image/*" multiple hidden>
-
-        <textarea id="ai-text" rows="2"
-                  placeholder="Describe your project, brand, or aesthetic…"></textarea>
-
-        <div id="ai-images-grid" hidden></div>
-
-        <div class="ai-chat-actions">
-          <div class="ai-attach-wrapper">
-            <button type="button" class="ai-attach"
-                    onclick="toggleAttachMenu(event)"
-                    aria-label="Add image options" title="Add image">+</button>
-
-            <div class="ai-attach-menu" id="ai-attach-menu" hidden>
-              <button type="button" class="ai-attach-option"
-                      onclick="document.getElementById('ai-file').click(); closeAttachMenu();">
-                <span class="opt-icon">↑</span>
-                <span class="opt-text">
-                  <span class="opt-title">Upload from device</span>
-                  <span class="opt-sub">Click to browse files</span>
-                </span>
-              </button>
-              <div class="ai-attach-option ai-attach-hint">
-                <span class="opt-icon">⌘</span>
-                <span class="opt-text">
-                  <span class="opt-title">Paste from clipboard</span>
-                  <span class="opt-sub">Press ⌘V anywhere on the page</span>
-                </span>
-              </div>
-              <div class="ai-attach-option ai-attach-hint">
-                <span class="opt-icon">↓</span>
-                <span class="opt-text">
-                  <span class="opt-title">Drag and drop</span>
-                  <span class="opt-sub">Drop images into the chat box</span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="ai-submit-group">
-            <button type="button" id="ai-stop" class="ai-stop" hidden onclick="abortAI()" aria-label="Stop analyzing" title="Stop">
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><rect width="10" height="10" rx="1.2"/></svg>
-            </button>
-            <button type="submit" id="ai-submit" class="ai-send">
-              <span class="ai-spinner" id="ai-spinner" hidden></span>
-              <span class="ai-send-label" id="ai-send-label">Find fonts →</span>
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <div id="ai-error" hidden></div>
-      <div id="ai-results"></div>
-
-      <button type="button" class="ai-scroll-down" onclick="scrollToBrowse()">
-        Or browse all fonts <span class="arrow">↓</span>
-      </button>
-    </section>
-
     <!-- Sidebar / Filters -->
     <aside class="sidebar" aria-label="Filters">
 
@@ -2544,12 +2048,6 @@
   </div>
 
 </div><!-- /app -->
-
-<!-- Image lightbox (used for AI moodboard previews) -->
-<div id="image-lightbox" hidden onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="event.stopPropagation(); closeLightbox()" aria-label="Close">×</button>
-  <img id="image-lightbox-img" alt="Expanded reference image">
-</div>
 
 <!-- Export CSS modal -->
 <div class="modal-overlay" id="css-modal" onclick="if(event.target===this)closeCSSModal()">
@@ -2813,13 +2311,6 @@ function goToWelcome() {
     sortSel.value = 'popularity';
   }
 
-  // Reset AI mode: clear inputs, results, image, switch back to Browse tab
-  const aiText = document.getElementById('ai-text');
-  if (aiText) aiText.value = '';
-  if (typeof clearAIImage === 'function') clearAIImage();
-  const aiResults = document.getElementById('ai-results');
-  if (aiResults) aiResults.innerHTML = '';
-  if (typeof hideAIError === 'function') hideAIError();
   // Snap back to Step 1 so the underlying app shows step 1 once welcome dismisses
   if (currentStep !== 1) goToStep(1);
 
@@ -2901,419 +2392,6 @@ function toggleCatPill(el, cat) {
 // ================================================================
 //  GOOGLE FONTS FETCH
 // ================================================================
-
-// ================================================================
-//  AI MODE — Gemini-powered font recommendations
-// ================================================================
-
-// Embed your Gemini API key here. Get one at https://aistudio.google.com/apikey
-// Restrict it in Google Cloud Console → Credentials → HTTP referrers:
-//   https://gena-lee.github.io/*
-//   http://localhost/*
-//   file:///*
-const GEMINI_API_KEY = 'AIzaSyC2BeZd_LHsHOSNcqBXNwSpb-pnqquE2Kg';
-const GEMINI_MODEL   = 'gemini-2.0-flash';
-const GEMINI_URL     = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-
-const MAX_AI_IMAGES = 5;
-
-let aiState = {
-  images: [],   // [{ base64, mime, name, dataUrl }]
-};
-
-// Switch between Browse and AI modes
-// Smoothly scroll the page down to the browse-grid section
-function scrollToBrowse() {
-  const section = document.getElementById('browse-section');
-  if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ── Image upload handling ────────────────────────────────────
-
-function handleImageFiles(files) {
-  const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-  if (!imageFiles.length) {
-    showAIError('Please upload image files (JPG, PNG, etc.).');
-    return;
-  }
-
-  const remaining = MAX_AI_IMAGES - aiState.images.length;
-  if (remaining <= 0) {
-    showAIError(`You can attach up to ${MAX_AI_IMAGES} images.`);
-    return;
-  }
-
-  const toAdd = imageFiles.slice(0, remaining);
-  if (imageFiles.length > remaining) {
-    showAIError(`Only added ${remaining}; max is ${MAX_AI_IMAGES} images.`);
-  } else {
-    hideAIError();
-  }
-
-  toAdd.forEach(file => {
-    if (file.size > 8 * 1024 * 1024) {
-      showAIError(`"${file.name}" is too large (max 8MB each).`);
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = e => {
-      const dataUrl = e.target.result;
-      aiState.images.push({
-        base64:  dataUrl.split(',')[1],
-        mime:    file.type,
-        name:    file.name,
-        dataUrl: dataUrl,
-      });
-      renderAIImages();
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-function renderAIImages() {
-  const grid = document.getElementById('ai-images-grid');
-  if (!grid) return;
-  if (!aiState.images.length) {
-    grid.hidden = true;
-    grid.innerHTML = '';
-    return;
-  }
-  grid.hidden = false;
-  grid.innerHTML = aiState.images.map((img, idx) => `
-    <div class="ai-image-tile">
-      <img src="${img.dataUrl}" alt="Reference ${idx + 1}" onclick="openLightbox(${idx})">
-      <button class="ai-tile-remove" onclick="event.stopPropagation(); removeAIImage(${idx})" aria-label="Remove image">×</button>
-    </div>
-  `).join('');
-}
-
-function openLightbox(idx) {
-  const img = aiState.images[idx];
-  if (!img) return;
-  const lb     = document.getElementById('image-lightbox');
-  const lbImg  = document.getElementById('image-lightbox-img');
-  lbImg.src    = img.dataUrl;
-  lbImg.alt    = img.name || `Reference ${idx + 1}`;
-  lb.hidden    = false;
-}
-
-function closeLightbox() {
-  document.getElementById('image-lightbox').hidden = true;
-}
-
-// Global: Escape closes the lightbox (registered once)
-if (!window._lightboxEscWired) {
-  window._lightboxEscWired = true;
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      const lb = document.getElementById('image-lightbox');
-      if (lb && !lb.hidden) closeLightbox();
-    }
-  });
-}
-
-function removeAIImage(idx) {
-  aiState.images.splice(idx, 1);
-  renderAIImages();
-}
-
-// Clear ALL attached images (used by reset/welcome navigation and on submit)
-function clearAIImage() {
-  aiState.images = [];
-  renderAIImages();
-  const fileInput = document.getElementById('ai-file');
-  if (fileInput) fileInput.value = '';
-}
-
-// Toggle the + button popover menu with upload options
-function toggleAttachMenu(e) {
-  if (e) e.stopPropagation();
-  const menu = document.getElementById('ai-attach-menu');
-  if (menu) menu.hidden = !menu.hidden;
-}
-
-function closeAttachMenu() {
-  const menu = document.getElementById('ai-attach-menu');
-  if (menu) menu.hidden = true;
-}
-
-// Close the attach menu when clicking outside it
-document.addEventListener('click', e => {
-  const menu = document.getElementById('ai-attach-menu');
-  if (!menu || menu.hidden) return;
-  if (!e.target.closest('.ai-attach-wrapper')) closeAttachMenu();
-});
-
-// Also close on Escape
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeAttachMenu();
-});
-
-// Wire drop zone events once on page load
-(function setupAIDropZone() {
-  const card      = document.getElementById('ai-chat-card');
-  const fileInput = document.getElementById('ai-file');
-  if (!card || !fileInput) return;
-
-  fileInput.addEventListener('change', e => {
-    if (e.target.files.length) handleImageFiles(e.target.files);
-    e.target.value = '';   // reset so picking the same file again still fires change
-  });
-
-  // The whole chat card is the drop target — feels more cohesive
-  let dragDepth = 0;
-  card.addEventListener('dragenter', e => {
-    e.preventDefault();
-    dragDepth++;
-    card.classList.add('dragging');
-  });
-  card.addEventListener('dragover', e => {
-    e.preventDefault();
-  });
-  card.addEventListener('dragleave', e => {
-    e.preventDefault();
-    dragDepth--;
-    if (dragDepth <= 0) {
-      dragDepth = 0;
-      card.classList.remove('dragging');
-    }
-  });
-  card.addEventListener('drop', e => {
-    e.preventDefault();
-    dragDepth = 0;
-    card.classList.remove('dragging');
-    if (e.dataTransfer.files.length) handleImageFiles(e.dataTransfer.files);
-  });
-
-  // Auto-resize textarea as user types
-  const textarea = document.getElementById('ai-text');
-  if (textarea) {
-    const resize = () => {
-      textarea.style.height = 'auto';
-      textarea.style.height = Math.min(220, textarea.scrollHeight) + 'px';
-    };
-    textarea.addEventListener('input', resize);
-    // Cmd/Ctrl+Enter submits
-    textarea.addEventListener('keydown', e => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-        e.preventDefault();
-        submitAI();
-      }
-    });
-  }
-
-  // Paste from clipboard — only active when on step 1 (the AI section)
-  document.addEventListener('paste', e => {
-    if (currentStep !== 1) return;
-
-    const items = (e.clipboardData || window.clipboardData)?.items;
-    if (!items) return;
-
-    const imageFiles = Array.from(items)
-      .filter(item => item.kind === 'file' && item.type.startsWith('image/'))
-      .map(item => item.getAsFile())
-      .filter(Boolean);
-
-    if (imageFiles.length) {
-      e.preventDefault();
-      handleImageFiles(imageFiles);
-    }
-  });
-})();
-
-// ── Gemini API call ──────────────────────────────────────────
-
-function buildGeminiPrompt(brief) {
-  // Send the curated FONT_META list as a catalog Gemini must pick from
-  const catalog = Object.entries(FONT_META)
-    .map(([family, meta]) => {
-      const moods = meta.m.join(', ');
-      const uses  = meta.u.join(', ');
-      return `- ${family} — moods: [${moods}], use cases: [${uses}]`;
-    })
-    .join('\n');
-
-  const imageCount = aiState.images.length;
-  const imageNote  = imageCount
-    ? `The designer also attached ${imageCount} reference image${imageCount === 1 ? '' : 's'} (moodboards or screenshots of fonts they like). Consider their style, mood, and any visible typography.`
-    : '';
-
-  return `You are a typography expert helping a designer choose fonts for their project.
-
-The designer's brief:
-"${brief || '(No written brief — base recommendations on the attached reference image(s) only.)'}"
-
-${imageNote}
-
-Pick 4 to 6 fonts from the catalog below that best match this brief. For each recommendation, write ONE concise sentence explaining specifically why it fits the brief (refer to mood, use case, or visible style).
-
-Respond in this exact JSON format and nothing else:
-{
-  "recommendations": [
-    { "family": "Inter", "reason": "Clean, modern sans-serif that..." }
-  ]
-}
-
-The "family" value MUST exactly match a font name from this catalog:
-
-${catalog}`;
-}
-
-async function callGeminiForFonts(brief, signal) {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-    throw new Error('AI mode is not configured yet. Add your Gemini API key in the code.');
-  }
-
-  const parts = [{ text: buildGeminiPrompt(brief) }];
-  aiState.images.forEach(img => {
-    parts.push({
-      inline_data: {
-        mime_type: img.mime,
-        data:      img.base64,
-      },
-    });
-  });
-
-  const body = {
-    contents: [{ parts }],
-    generationConfig: {
-      temperature:      0.7,
-      response_mime_type: 'application/json',
-    },
-  };
-
-  const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(body),
-    signal,
-  });
-
-  if (!res.ok) {
-    if (res.status === 429) throw new Error('AI mode has reached its daily limit. Try again tomorrow — or scroll down to browse all fonts manually.');
-    if (res.status === 400) throw new Error('Gemini rejected the request. The image may be too large or in an unsupported format.');
-    const text = await res.text().catch(() => '');
-    throw new Error(`API error (${res.status}). ${text.slice(0, 120)}`);
-  }
-
-  const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error('Unexpected response shape from Gemini.');
-
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    throw new Error('Gemini returned non-JSON. Try rewording your brief.');
-  }
-
-  const recs = (parsed.recommendations || [])
-    .filter(r => r && r.family && r.reason)
-    .filter(r => allFonts.find(f => f.family === r.family));   // must be a real Google Font we have
-
-  if (!recs.length) throw new Error('No valid recommendations returned. Try a different brief.');
-
-  return recs.slice(0, 6);
-}
-
-// ── Render AI results as font cards (reuses existing card styling) ──
-
-function renderAIResults(recommendations) {
-  const out = document.getElementById('ai-results');
-  if (!recommendations.length) {
-    out.innerHTML = '';
-    return;
-  }
-
-  loadFontCSS(recommendations.map(r => r.family));
-
-  const cards = recommendations.map(rec => {
-    const font   = allFonts.find(f => f.family === rec.family);
-    const safe   = escHtml(rec.family);
-    const safej  = rec.family.replace(/'/g, "\\'");
-    const cat    = font ? (CAT_LABELS[font.category] || font.category) : '';
-
-    const weights = font ? font.variants
-      .map(v => v === 'regular' ? '400' : v === 'italic' ? null : v.replace('italic',''))
-      .filter(v => v && /^\d+$/.test(v))
-      .filter((v, i, arr) => arr.indexOf(v) === i)
-      .sort((a, b) => +a - +b) : [];
-    const weightTags = weights.map(w => `<span class="card-weight">${w}</span>`).join('');
-
-    return `
-      <div class="font-card" data-family="${safe}" onclick="selectFont('${safej}')">
-        <span class="card-cat">${cat.toUpperCase()}</span>
-        <div class="card-name-display" style="font-family:'${safe}',serif;">${safe}</div>
-        <div class="card-abc" style="font-family:'${safe}',serif;">Aa Bb Cc 123</div>
-        <div class="card-desc">${escHtml(rec.reason)}</div>
-        <div class="card-weights">${weightTags}</div>
-      </div>`;
-  }).join('');
-
-  out.innerHTML = `
-    <div class="ai-results-label">${recommendations.length} recommended fonts</div>
-    <div class="font-grid">${cards}</div>
-  `;
-}
-
-// ── Submit handler ───────────────────────────────────────────
-
-let aiAbortController = null;
-
-async function submitAI() {
-  // Already analyzing — ignore (use the separate stop button to abort)
-  if (aiAbortController) return;
-
-  const brief = document.getElementById('ai-text').value.trim();
-  if (!brief && !aiState.images.length) {
-    showAIError('Add a description or attach an image (or both).');
-    return;
-  }
-
-  const submit  = document.getElementById('ai-submit');
-  const stopBtn = document.getElementById('ai-stop');
-  const spinner = document.getElementById('ai-spinner');
-  const label   = document.getElementById('ai-send-label');
-  hideAIError();
-  submit.disabled   = true;
-  spinner.hidden    = false;
-  label.textContent = 'Analyzing…';
-  stopBtn.hidden    = false;
-  document.getElementById('ai-results').innerHTML = '';
-
-  aiAbortController = new AbortController();
-
-  try {
-    const recs = await callGeminiForFonts(brief, aiAbortController.signal);
-    renderAIResults(recs);
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      // User clicked stop — silent recovery, no error shown
-    } else {
-      showAIError(err.message);
-    }
-  } finally {
-    aiAbortController = null;
-    submit.disabled   = false;
-    spinner.hidden    = true;
-    label.textContent = 'Find fonts →';
-    stopBtn.hidden    = true;
-  }
-}
-
-function abortAI() {
-  if (aiAbortController) aiAbortController.abort();
-}
-
-function showAIError(msg) {
-  const el = document.getElementById('ai-error');
-  el.textContent = msg;
-  el.hidden = false;
-}
-
-function hideAIError() {
-  document.getElementById('ai-error').hidden = true;
-}
 
 // Google Fonts ships icon/symbol/emoji fonts in the same API response as text fonts.
 // These render as gibberish (or empty boxes) when used for text, so filter them out.
@@ -3822,20 +2900,12 @@ function goBack() {
 }
 
 function updateStepProgress(n) {
-  // Step 1 hides the counter/heading entirely so AI mode reads as a clean focal point.
-  // Subsequent steps still show their counter + heading + subtitle.
-  const progress = document.getElementById('step-progress');
-  if (n === 1) {
-    progress.style.display = 'none';
-  } else {
-    progress.style.display = '';
-    const info = STEP_INFO[n - 1];
-    document.getElementById('sp-inner').innerHTML = `
-      <div class="sp-counter">Step ${n} of ${STEP_INFO.length}</div>
-      <h1 class="sp-heading">${info.heading}</h1>
-      <p class="sp-subtitle">${info.subtitle}</p>
-    `;
-  }
+  const info = STEP_INFO[n - 1];
+  document.getElementById('sp-inner').innerHTML = `
+    <div class="sp-counter">Step ${n} of ${STEP_INFO.length}</div>
+    <h1 class="sp-heading">${info.heading}</h1>
+    <p class="sp-subtitle">${info.subtitle}</p>
+  `;
   updateHeaderSteps(n);
 }
 
@@ -4523,11 +3593,11 @@ function renderStep5(primary, pairing) {
   const header = `
     <div class="scale-header">
       <div class="scale-th">Preview</div>
-      <div class="scale-th">Name</div>
-      <div class="scale-th">Size</div>
-      <div class="scale-th">Weight</div>
-      <div class="scale-th">Typeface</div>
-      <div class="scale-th">Use Case</div>
+      <div class="scale-th">Name<span    class="col-resize" data-col-var="col-name"      title="Drag to resize"></span></div>
+      <div class="scale-th">Size<span    class="col-resize" data-col-var="col-size"      title="Drag to resize"></span></div>
+      <div class="scale-th">Weight<span  class="col-resize" data-col-var="col-weight"    title="Drag to resize"></span></div>
+      <div class="scale-th">Typeface<span class="col-resize" data-col-var="col-typeface" title="Drag to resize"></span></div>
+      <div class="scale-th">Use Case<span class="col-resize" data-col-var="col-usecase"  title="Drag to resize"></span></div>
       <div class="scale-th"></div>
     </div>`;
 
@@ -4565,6 +3635,9 @@ function renderStep5(primary, pairing) {
       </div>
     </div>
   `;
+
+  // Wire drag-to-resize on the chart's header columns
+  setupColumnResize();
 }
 
 // ── Type scale chart editing ────────────────────────────────
@@ -4770,6 +3843,39 @@ function addScaleRow() {
   if (lastRow && lastRow.scrollIntoView) {
     lastRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+}
+
+// Wire drag-to-resize handles on the scale chart header
+function setupColumnResize() {
+  const chart = document.getElementById('scale-chart');
+  if (!chart) return;
+  const handles = chart.querySelectorAll('.col-resize');
+  handles.forEach(handle => {
+    handle.addEventListener('mousedown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const varName    = handle.dataset.colVar;
+      const startX     = e.clientX;
+      const cs         = getComputedStyle(chart).getPropertyValue('--' + varName).trim();
+      const startWidth = parseFloat(cs) || 0;
+
+      handle.classList.add('resizing');
+      document.body.classList.add('col-resizing');
+
+      function onMove(ev) {
+        const newWidth = Math.max(50, startWidth + (ev.clientX - startX));
+        chart.style.setProperty('--' + varName, newWidth + 'px');
+      }
+      function onUp() {
+        handle.classList.remove('resizing');
+        document.body.classList.remove('col-resizing');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
 }
 
 // ================================================================
