@@ -1,0 +1,17 @@
+# Reflection — Mini Project 2
+
+## What did you build?
+
+I built **Fontface**, a web-based type system builder that helps users pick a primary font, match it with a complementary pairing, preview both at real sizes, and export the result as ready-to-paste CSS. It walks the user through a guided five-step flow — filter, pick primary, choose pairing, preview, export — and produces a complete typographic system at the end, including a full scale (display, headings, body, caption, label), recommended weights, and a sample specimen. It runs entirely in the browser with no signup, no setup, and no backend. The deployed tool lives at `https://fontface-two.vercel.app` and is designed primarily for **non-designers** — PMs, founders, students — who need polished typography without owning the vocabulary, while also being useful for designers who want a faster prototyping path.
+
+## What decisions did you make?
+
+I chose the **Google Fonts Developer API** as the data source because it's free, well-documented, and returns enough metadata (~1,900 font families with categories and variants) to power both filtering and the pairing logic. I built the tool as a **single static HTML file** with no framework or build step — matching my MP2 declaration's "no backend, runs as a standalone file" constraint — and deployed on Vercel after starting on GitHub Pages, mainly because Vercel gave me a cleaner URL and auto-deploys every push. The biggest scope change from my declaration was attempting an **AI mode** (Gemini-powered font recommendations from a brief and moodboard images), which I built but ultimately removed when Google's free-tier policy made it unusable for any public visitor. I also went significantly deeper on interactive polish than the declaration described — custom font-picker dropdowns with previews, drag-to-resize size labels, an editable type scale chart with add/delete/undo, and animated page transitions.
+
+## What would you do differently?
+
+One thing I'd do for next steps is **actually ship the AI mode**. The core idea — letting a non-designer describe their brand in plain language and get tailored font recommendations — directly addresses my target user's biggest barrier. The reason I removed it was technical: Google's free tier on Gemini was reduced to zero requests for my project, and I made the call not to gate the feature behind enabling billing. Next iteration, I'd resolve the API access properly (set up billing with a strict budget cap, or build a tiny serverless proxy that hides a paid key behind rate limiting) so the feature works for every visitor. Without it, the tool still works, but the most impactful path for non-designers is missing.
+
+## What does this work demonstrate?
+
+This project demonstrates **C1 (Vibecoding)** through extensive iteration with Claude Code — multiple redesigns of the visual hero, a rewritten pairing algorithm (from a flat 65-font dictionary to a tag-aware scoring system documented in [PAIRING.md](../Week%208/PAIRING.md)), and many corrections to AI defaults. It demonstrates **C4 (APIs)** through the Google Fonts Developer API integration in `fetchFonts()`, including the deliberate choice to use HTTP referrer restrictions instead of `.gitignore` for a client-side static app where the key has to ship to the browser. And it demonstrates **C8 (Building and Deploying)** through a live, end-to-end usable tool plus an honest decision to *remove* a feature rather than ship a broken one — the AI-mode removal in commit `cdfdf5f` is the clearest evidence of that judgment call.
