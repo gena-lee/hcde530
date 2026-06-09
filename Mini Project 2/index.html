@@ -1600,19 +1600,30 @@
     .scale-row:last-child { border-bottom: none; }
 
     .scale-chart {
-      --col-name:     110px;
-      --col-size:     85px;
-      --col-weight:   120px;
-      --col-typeface: 165px;
-      --col-usecase:  180px;
+      --col-name:     100px;
+      --col-size:     80px;
+      --col-weight:   115px;
+      --col-typeface: 155px;
+      --col-usecase:  170px;
+      overflow-x: auto;
     }
 
     .scale-header,
     .scale-row {
       display: grid;
-      grid-template-columns: minmax(340px, 1fr) var(--col-name) var(--col-size) var(--col-weight) var(--col-typeface) var(--col-usecase) 40px;
+      grid-template-columns: minmax(240px, 1fr) var(--col-name) var(--col-size) var(--col-weight) var(--col-typeface) var(--col-usecase) 56px;
       border-bottom: 1px solid var(--border);
       align-items: stretch;
+    }
+
+    /* Pin the delete-button column to the right edge so it's always visible,
+       even if the user resizes the other columns wide enough to overflow. */
+    .scale-row > .scale-action-col,
+    .scale-header > .scale-th:last-child {
+      position: sticky;
+      right: 0;
+      background: var(--surface);
+      z-index: 3;
     }
 
     /* Drag-to-resize handle on header column edges */
@@ -1649,14 +1660,16 @@
     }
 
     .scale-preview-col {
-      padding: 16px 12px 16px 18px;
+      padding: 16px 12px 16px 36px;
       background: transparent;
       display: flex;
       align-items: center;
       overflow: hidden;
     }
 
-    .scale-header > .scale-th:first-child { padding-left: 18px; }
+    .scale-header > .scale-th:first-child { padding-left: 36px; }
+    .scale-header > .scale-th:last-child  { padding-right: 14px; }
+    .scale-row > .scale-action-col        { padding-right: 14px; }
 
 
     .scale-preview-text {
@@ -1765,7 +1778,7 @@
       background: none;
       border: none;
       color: var(--text-muted);
-      font-size: 16px;
+      font-size: 18px;
       line-height: 1;
       cursor: pointer;
       padding: 0;
@@ -3592,12 +3605,12 @@ function renderStep5(primary, pairing) {
 
   const header = `
     <div class="scale-header">
-      <div class="scale-th">Preview</div>
-      <div class="scale-th">Name<span    class="col-resize" data-col-var="col-name"      title="Drag to resize"></span></div>
-      <div class="scale-th">Size<span    class="col-resize" data-col-var="col-size"      title="Drag to resize"></span></div>
-      <div class="scale-th">Weight<span  class="col-resize" data-col-var="col-weight"    title="Drag to resize"></span></div>
-      <div class="scale-th">Typeface<span class="col-resize" data-col-var="col-typeface" title="Drag to resize"></span></div>
-      <div class="scale-th">Use Case<span class="col-resize" data-col-var="col-usecase"  title="Drag to resize"></span></div>
+      <div class="scale-th">Preview<span    class="col-resize" data-right-var="col-name"                              title="Drag to resize"></span></div>
+      <div class="scale-th">Name<span       class="col-resize" data-left-var="col-name"     data-right-var="col-size"     title="Drag to resize"></span></div>
+      <div class="scale-th">Size<span       class="col-resize" data-left-var="col-size"     data-right-var="col-weight"   title="Drag to resize"></span></div>
+      <div class="scale-th">Weight<span     class="col-resize" data-left-var="col-weight"   data-right-var="col-typeface" title="Drag to resize"></span></div>
+      <div class="scale-th">Typeface<span   class="col-resize" data-left-var="col-typeface" data-right-var="col-usecase"  title="Drag to resize"></span></div>
+      <div class="scale-th">Use Case<span   class="col-resize" data-left-var="col-usecase"                             title="Drag to resize"></span></div>
       <div class="scale-th"></div>
     </div>`;
 
@@ -3845,26 +3858,50 @@ function addScaleRow() {
   }
 }
 
-// Wire drag-to-resize handles on the scale chart header
+// Wire drag-to-resize handles on the scale chart header.
+// Each handle sits at the boundary between two columns and adjusts BOTH:
+// dragging right grows the left column AND shrinks the right column by the same delta.
+// The Preview column is flexible (1fr) — handles touching it only adjust the OTHER column.
 function setupColumnResize() {
   const chart = document.getElementById('scale-chart');
   if (!chart) return;
+
+  function getVarPx(name) {
+    return parseFloat(getComputedStyle(chart).getPropertyValue('--' + name)) || 0;
+  }
+
   const handles = chart.querySelectorAll('.col-resize');
   handles.forEach(handle => {
     handle.addEventListener('mousedown', e => {
       e.preventDefault();
       e.stopPropagation();
-      const varName    = handle.dataset.colVar;
-      const startX     = e.clientX;
-      const cs         = getComputedStyle(chart).getPropertyValue('--' + varName).trim();
-      const startWidth = parseFloat(cs) || 0;
+      const leftVar  = handle.dataset.leftVar;
+      const rightVar = handle.dataset.rightVar;
+      const startX   = e.clientX;
+      const startLeft  = leftVar  ? getVarPx(leftVar)  : 0;
+      const startRight = rightVar ? getVarPx(rightVar) : 0;
 
       handle.classList.add('resizing');
       document.body.classList.add('col-resizing');
 
       function onMove(ev) {
-        const newWidth = Math.max(50, startWidth + (ev.clientX - startX));
-        chart.style.setProperty('--' + varName, newWidth + 'px');
+        const delta = ev.clientX - startX;
+        if (leftVar && rightVar) {
+          // Both columns fixed: split the delta — left grows, right shrinks by same amount
+          const newLeft  = Math.max(50, startLeft  + delta);
+          const newRight = Math.max(50, startRight - delta);
+          chart.style.setProperty('--' + leftVar,  newLeft  + 'px');
+          chart.style.setProperty('--' + rightVar, newRight + 'px');
+        } else if (leftVar) {
+          // Only left column is fixed (right side is flexible): standard resize
+          const newLeft = Math.max(50, startLeft + delta);
+          chart.style.setProperty('--' + leftVar, newLeft + 'px');
+        } else if (rightVar) {
+          // Only right column is fixed (left side, e.g. Preview, is flexible)
+          // Drag right -> shrink right column -> Preview grows
+          const newRight = Math.max(50, startRight - delta);
+          chart.style.setProperty('--' + rightVar, newRight + 'px');
+        }
       }
       function onUp() {
         handle.classList.remove('resizing');
